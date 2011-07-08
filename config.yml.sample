@@ -1,0 +1,14 @@
+:cinch:
+  :nick: "url-grabber"
+  :server: "irc.somenetwork.tld"
+  :channels:
+  - "#channel1"
+  - "#channel2 password"
+  :plugins:
+  - UrlGrabber
+:bitly:
+  :login: "your_bitly_login_here"
+  :apiKey: "your_bitly_api_key_here"
+:url_grabber:
+  :url_dir: "path/to/somewhere"
+
