@@ -1,25 +1,28 @@
+require 'cinch'
 require 'json'
 require 'open-uri'
 require 'nokogiri'
 require 'htmlentities'
+require 'mechanize'
 
 class UrlGrabber
   include  Cinch::Plugin
 
+  prefix ''
   match /https?/, :method => :execute
   react_on :channel
 
   def execute(m)
-    bot.logger.info("received url: #{m.message}")
+    bot.logger.debug("received url(s): #{m.message}")
     file_output = {}
     extract_urls(m.message).each do |url|
       title,status = extract_title(url)
       short_url = bitlyfy(url) unless status == :error
       url_to_use = short_url == :error ? url : short_url
       file_output[url_to_use] = title
-      m.reply("#{title} | #{url_to_use} // #{m.nick}") if status == :ok
+      m.reply("#{title} | #{url_to_use} // #{m.user.nick}") if status == :ok
     end
-    output_file = $config[:url_grabber][:url_dir] + "/" + m.channel.gsub('^#','')
+    output_file = $config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
     write_output_to_file(output_file, file_output)
   end
 
@@ -28,19 +31,20 @@ class UrlGrabber
   end
 
   def extract_title(url)
+    bot.logger.debug("extracting title for #{url}")
     agent = Mechanize.new
-    
     begin
       puts url
       headers = agent.head(url)
-      return nil, :not_html unless headers =~ %r{text/html}
+      bot.logger.debug(headers.content_type)
+      return nil, :not_html unless headers.content_type =~ %r{text/html}
     
-      document = Nokogiri::HTML(agent.get(url).body).at_css("title")
+      title = Nokogiri::HTML(agent.get(url).body).at_css("title").content
       
       return nil, :no_title if title.nil?
       
-      puts title
-      return HTMLEntities.decode(title), :ok
+      bot.logger.debug("found #{title}")
+      return HTMLEntities.new.decode(title), :ok
 
     rescue Mechanize::ResponseCodeError => e
       ending_crap = /['\)\",.\/]$/
@@ -52,22 +56,24 @@ class UrlGrabber
         return nil, :broken
       end
     rescue => e
-      puts e.class, e.message
+      puts e.class, e.message, e.backtrace
       return nil, :error
     end
   end
 
   def bitlyfy(url)
     agent = Mechanize.new
-    response_json = JSON.parse(agent.get("http://api.bitly.com",
-      :login => $config[:bitly][:login]
-      :apiKey => $config[:bitly][:api_key]
+    response_json = JSON.parse(agent.get("http://api.bitly.com/v3/shorten",
+      :login => $config[:bitly][:login],
+      :apiKey => $config[:bitly][:api_key],
       :format => "json",
       :longUrl => url).body)
+
+    bot.logger.debug(response_json)
     
     case response_json["status_code"]
     when 200
-      return response_json["url"]
+      return response_json["data"]["url"]
     when 200
       return :error
     end
@@ -77,6 +83,7 @@ class UrlGrabber
   end
 
   def write_output_to_file(file, urls = {})
+    bot.logger.debug("writing to #{file}")
     File.open(file, 'a') do |f|
       urls.each do |url, title|
         f.write(%(#{Time.now}: <a href="#{url}">#{title} - #{url}</a>\n))
