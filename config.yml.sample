@@ -6,9 +6,13 @@
   - "#channel2 password"
   :plugins:
   - UrlGrabber
+  - Hello
+  - WikiLookup
 :bitly:
   :login: "your_bitly_login_here"
   :apiKey: "your_bitly_api_key_here"
 :url_grabber:
   :url_dir: "path/to/somewhere"
+:wiki_lookup:
+  :url: "http://en.wikipedia.org/wiki/"
 
