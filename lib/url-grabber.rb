@@ -46,7 +46,7 @@ class UrlGrabber
       
       return nil, :no_title if title.nil?
 
-      title = self.sanitize_title(title)
+      title = UrlGrabber.sanitize_title(title)
       
       bot.logger.debug("found #{title}")
       return title, :ok
