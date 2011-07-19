@@ -30,11 +30,14 @@ class UrlGrabber
     return URI.extract(message, /https?/)
   end
 
+  def self.sanitize_title(title)
+    HTMLEntities.new.decode(title.gsub(/\r?\n/, " ").strip)
+  end
+
   def extract_title(url)
     bot.logger.debug("extracting title for #{url}")
     agent = Mechanize.new
     begin
-      puts url
       headers = agent.head(url)
       bot.logger.debug(headers.content_type)
       return nil, :not_html unless headers.content_type =~ %r{text/html}
@@ -42,9 +45,11 @@ class UrlGrabber
       title = Nokogiri::HTML(agent.get(url).body).at_css("title").content
       
       return nil, :no_title if title.nil?
+
+      title = self.sanitize_title(title)
       
       bot.logger.debug("found #{title}")
-      return HTMLEntities.new.decode(title), :ok
+      return title, :ok
 
     rescue Mechanize::ResponseCodeError => e
       ending_crap = /['\)\",.\/]$/
