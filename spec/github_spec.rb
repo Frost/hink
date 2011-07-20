@@ -29,6 +29,34 @@ describe GitHub do
     end
   end
 
+  describe "handle defaults" do
+    before do
+      $config = {}
+      $config[:github] = {}
+      $config[:github][:"#withdefault"] = {:account => "Frost", :repo => "url-grabber", :issue => 1}
+    end
+
+    it "should handle empty reference" do
+      GitHub.merge_reference_with_default({:account => nil, :repo => nil, :issue => nil}, "#withdefault").should == {:account => "Frost", :repo => "url-grabber", :issue => 1}
+      GitHub.merge_reference_with_default({:account => nil, :repo => nil, :issue => nil}, "#withoutdefault").should == {:account => nil, :repo => nil, :issue => nil}
+    end
+
+    it "should handle :account references" do
+      GitHub.merge_reference_with_default({:account => "Koronen", :repo => nil, :issue => nil}, "#withdefault").should == {:account => "Koronen", :repo => "url-grabber", :issue => 1}
+      GitHub.merge_reference_with_default({:account => "Koronen", :repo => nil, :issue => nil}, "#withoutdefault").should == {:account => "Koronen", :repo => nil, :issue => nil}
+    end
+
+    it "should handle :account/:repo references" do
+      GitHub.merge_reference_with_default({:account => "Koronen", :repo => "spargris", :issue => nil}, "#withdefault").should == {:account => "Koronen", :repo => "spargris", :issue => 1}
+      GitHub.merge_reference_with_default({:account => "Koronen", :repo => "spargris", :issue => nil}, "#withoutdefault").should == {:account => "Koronen", :repo => "spargris", :issue => nil}
+    end
+
+    it "should handle :account/:repo#:issue references" do
+      GitHub.merge_reference_with_default({:account => "Koronen", :repo => "spargris", :issue => 2}, "#withdefault").should == {:account => "Koronen", :repo => "spargris", :issue => 2}
+      GitHub.merge_reference_with_default({:account => "Koronen", :repo => "spargris", :issue => 2}, "#withoutdefault").should == {:account => "Koronen", :repo => "spargris", :issue => 2}
+    end
+  end
+
   describe "convert github references to urls" do
     it "should handle :account references" do
       GitHub.reference_url({:account => "Frost", :repo => nil, :issue => nil}).should == "https://github.com/Frost"
