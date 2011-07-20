@@ -25,9 +25,9 @@ class GitHub
 
   def self.merge_reference_with_default(reference, channel)
     $config[:github] ||= {}
-    $config[:github][channel.to_sym] ||= {}
+    $config[:github][channel.name.to_sym] ||= {}
 
-    default = {:account => nil, :repo => nil, :issue => nil}.merge($config[:github][channel.to_sym])
+    default = {:account => nil, :repo => nil, :issue => nil}.merge($config[:github][channel.name.to_sym])
 
     reference = default.merge(reference.select{|k,v| !v.nil?})
   end
