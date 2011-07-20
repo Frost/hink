@@ -16,4 +16,6 @@
   :url_dir: "path/to/somewhere"
 :wiki_lookup:
   :url: "http://en.wikipedia.org/wiki/"
-
+:github:
+  :"#channel":
+    :repo: "url-grabber"
