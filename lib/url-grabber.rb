@@ -13,6 +13,9 @@ class UrlGrabber
   react_on :channel
 
   def execute(m)
+    # don't reply to urls posted by self
+    return if m.user.nick == $config[:cinch][:nick]
+
     bot.logger.debug("received url(s): #{m.message}")
     file_output = {}
     extract_urls(m.message).each do |url|
