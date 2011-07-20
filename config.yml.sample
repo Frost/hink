@@ -8,6 +8,7 @@
   - UrlGrabber
   - Hello
   - WikiLookup
+  - GitHub
 :bitly:
   :login: "your_bitly_login_here"
   :api_key: "your_bitly_api_key_here"
