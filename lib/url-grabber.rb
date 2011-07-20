@@ -6,7 +6,7 @@ require 'htmlentities'
 require 'mechanize'
 
 class UrlGrabber
-  include  Cinch::Plugin
+  include Cinch::Plugin
 
   prefix ''
   match /https?/, :method => :execute
