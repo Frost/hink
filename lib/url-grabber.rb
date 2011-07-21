@@ -19,7 +19,7 @@ class UrlGrabber
     bot.logger.debug("received url(s): #{m.message}")
     file_output = {}
     extract_urls(m.message).each do |url|
-      title,status = extract_title(url)
+      title,status = extract_title(bot.logger, url)
       short_url = bitlyfy(url) unless status == :error
       url_to_use = short_url == :error ? url : short_url
       file_output[url_to_use] = title
@@ -37,21 +37,22 @@ class UrlGrabber
     HTMLEntities.new.decode(title.gsub(/\r?\n/, " ").strip)
   end
 
-  def extract_title(url)
-    bot.logger.debug("extracting title for #{url}")
+  def self.extract_title(logger, url)
+    logger.debug("extracting title for #{url}")
     agent = Mechanize.new
     begin
       headers = agent.head(url)
-      bot.logger.debug(headers.content_type)
+      logger.debug 'i got the headers'
+      logger.debug(headers.content_type)
       return nil, :not_html unless headers.content_type =~ %r{text/html}
     
       title = Nokogiri::HTML(agent.get(url).body).at_css("title").content
-      
+      logger.debug 'i got the title'     
       return nil, :no_title if title.nil?
 
       title = UrlGrabber.sanitize_title(title)
       
-      bot.logger.debug("found #{title}")
+      logger.debug("found #{title}")
       return title, :ok
 
     rescue Mechanize::ResponseCodeError => e
@@ -61,7 +62,7 @@ class UrlGrabber
         url = url.gsub(ending_crap, '')
         retry
       else
-        return nil, :broken
+        return e.to_s, :broken
       end
     rescue => e
       puts e.class, e.message, e.backtrace
