@@ -42,12 +42,10 @@ class UrlGrabber
     agent = Mechanize.new
     begin
       headers = agent.head(url)
-      logger.debug 'i got the headers'
       logger.debug(headers.content_type)
       return nil, :not_html unless headers.content_type =~ %r{text/html}
     
       title = Nokogiri::HTML(agent.get(url).body).at_css("title").content
-      logger.debug 'i got the title'     
       return nil, :no_title if title.nil?
 
       title = UrlGrabber.sanitize_title(title)
