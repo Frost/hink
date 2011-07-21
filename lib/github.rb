@@ -16,7 +16,7 @@ class GitHub
       url = GitHub.reference_url(reference)
       if not url.nil?
         title, status = UrlGrabber.extract_title bot.logger, url
-        m.reply("#{m.user.nick}: #{url} - #{title}")
+        m.reply("#{m.user.nick}: #{url} - #{title.gsub(/ - Issues - .*$/, '')}")
       end
     end
   end

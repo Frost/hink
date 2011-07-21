@@ -19,7 +19,7 @@ class UrlGrabber
     bot.logger.debug("received url(s): #{m.message}")
     file_output = {}
     extract_urls(m.message).each do |url|
-      title,status = extract_title(bot.logger, url)
+      title,status = UrlGrabber.extract_title(bot.logger, url)
       short_url = bitlyfy(url) unless status == :error
       url_to_use = short_url == :error ? url : short_url
       file_output[url_to_use] = title
