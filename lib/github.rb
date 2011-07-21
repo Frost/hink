@@ -18,6 +18,8 @@ class GitHub
         title, status = UrlGrabber.extract_title bot.logger, url
         m.reply("#{m.user.nick}: #{url} - #{title.gsub(/ - Issues - .*$/, '')}")
       end
+      title, status = UrlGrabber.extract_title bot.logger, url
+      m.reply("#{m.user.nick}: #{url} - #{title}")
     end
   end
 
