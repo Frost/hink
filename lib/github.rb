@@ -14,7 +14,12 @@ class GitHub
     GitHub.extract_references(m.message).each do |reference|
       reference = GitHub.merge_reference_with_default(reference, m.channel.name)
       url = GitHub.reference_url(reference)
-      m.reply("#{m.user.nick}: #{url}") unless url.nil?
+      if not url.nil?
+        title, status = UrlGrabber.extract_title bot.logger, url
+        m.reply("#{m.user.nick}: #{url} - #{title.gsub(/ - Issues - .*$/, '')}")
+      end
+      title, status = UrlGrabber.extract_title bot.logger, url
+      m.reply("#{m.user.nick}: #{url} - #{title}")
     end
   end
 
