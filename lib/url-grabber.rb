@@ -17,11 +17,11 @@ class UrlGrabber
     return if m.user.nick == $config[:cinch][:nick]
 
     # remove all non-printable characters
-    m.message = m.message.scan(/[[:print:]]/).join
+    message = m.message.scan(/[[:print:]]/).join
 
-    bot.logger.debug("received url(s): #{m.message}")
+    bot.logger.debug("received url(s): #{message}")
     file_output = {}
-    extract_urls(m.message).each do |url|
+    extract_urls(message).each do |url|
       title,status = UrlGrabber.extract_title(bot.logger, url)
       short_url = bitlyfy(url) unless status == :error
       url_to_use = short_url == :error ? url : short_url
