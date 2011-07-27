@@ -35,7 +35,7 @@ class UrlGrabber
   end
 
   def self.sanitize_title(title)
-    HTMLEntities.new.decode(title.gsub(/\r?\n/, " ").strip).gsub! /\s+/, ' '
+    HTMLEntities.new.decode(title).gsub(/\s+/, ' ').strip
   end
 
   def self.extract_title(logger, url)
