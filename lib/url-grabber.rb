@@ -16,6 +16,7 @@ class UrlGrabber
     # don't reply to urls posted by self
     return if m.user.nick == $config[:cinch][:nick]
 
+    m.message.gsub! /\u200B/, '' # remove zero-width spaces from message
     bot.logger.debug("received url(s): #{m.message}")
     file_output = {}
     extract_urls(m.message).each do |url|
