@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'cinch'
 require 'json'
 require 'open-uri'
@@ -29,7 +30,7 @@ class UrlGrabber
       m.reply("#{title} | #{url_to_use} // #{m.user.nick}") if status == :ok
     end
     output_file = $config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
-    write_output_to_file(output_file, file_output, m.user.nick)
+    write_output_to_file(output_file, file_output, m.user.nick, m.channel.name)
   end
 
   def extract_urls(message)
@@ -92,12 +93,27 @@ class UrlGrabber
     return :error
   end
 
-  def write_output_to_file(file, urls = {}, user= '?')
+  def write_output_to_file(file, urls = {}, user = '?', channel = '?')
     bot.logger.debug("writing to #{file}")
 	html = HTMLEntities.new
     File.open(file, 'a') do |f|
+	  if f.size == 0
+	    f << %{
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>#{channel} - Länksamling</title>
+    <style>
+      a:hover {color: red;}
+    </style>
+  </head>
+<body>
+  <pre>
+}
+	  end
       urls.each do |url, title|
-        f.write(%(#{Time.now} &lt;#{html.encode user}&gt;: <a href="#{url[:url]}">#{html.encode title}</a>#{url[:bitly].nil? ? '' : %{<a href="#{url[:bitly]}">#{url[:bitly]}</a>}}\n<br/>\n))
+        f.write(%(#{Time.now} &lt;#{html.encode user}&gt;: <a href="#{url[:url]}">#{html.encode title}</a>#{url[:bitly].nil? ? '' : %{<a href="#{url[:bitly]}">#{url[:bitly]}</a>}}\n))
       end
     end
   end
