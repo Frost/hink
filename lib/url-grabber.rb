@@ -30,7 +30,7 @@ class UrlGrabber
       m.reply("#{title} | #{url_to_use} // #{m.user.nick}") if status == :ok
     end
     output_file = $config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
-    write_output_to_file(output_file, file_output, m.user.nick, m.channel.name)
+    write_output_to_file(output_file, file_output, m.channel.name)
   end
 
   def extract_urls(message)
@@ -93,7 +93,7 @@ class UrlGrabber
     return :error
   end
 
-  def write_output_to_file(file, urls = {}, user = '?', channel = '?')
+  def write_output_to_file(file, urls = {}, channel = '?')
     bot.logger.debug("writing to #{file}")
 	html = HTMLEntities.new
     File.open(file, 'a') do |f|
@@ -113,7 +113,7 @@ class UrlGrabber
 }
 	  end
       urls.each do |url, title|
-        f.write(%(#{Time.now} &lt;#{html.encode user}&gt;: <a href="#{url[:url]}">#{html.encode title}</a>#{url[:bitly].nil? ? '' : %{<a href="#{url[:bitly]}">#{url[:bitly]}</a>}}\n))
+        f.write(%(#{Time.now}: <a href="#{url[:url]}">#{html.encode title}</a>#{url[:bitly].nil? ? '' : %{<a href="#{url[:bitly]}">#{url[:bitly]}</a>}}\n))
       end
     end
   end
