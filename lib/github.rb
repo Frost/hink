@@ -29,11 +29,11 @@ class GitHub
 
   def self.merge_reference_with_default(reference, channel)
     # Create config hashes if not already defined
-    $config[:github] ||= {}
-    $config[:github][channel.to_sym] ||= {}
+    Hink.config[:github] ||= {}
+    Hink.config[:github][channel.to_sym] ||= {}
 
     # Make the default hash complete
-    default = {:account => nil, :repo => nil, :issue => nil}.merge($config[:github][channel.to_sym])
+    default = {:account => nil, :repo => nil, :issue => nil}.merge(Hink.config[:github][channel.to_sym])
 
     # Merge!
     #reference = default.merge(reference.select{|k,v| !v.nil?})

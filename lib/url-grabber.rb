@@ -15,7 +15,7 @@ class UrlGrabber
 
   def execute(m)
     # don't reply to urls posted by self
-    return if m.user.nick == $config[:cinch][:nick]
+    return if m.user.nick == Hink.config[:cinch][:nick]
 
     # remove all non-printable characters
     message = m.message.scan(/[[:print:]]/).join
@@ -29,7 +29,7 @@ class UrlGrabber
       file_output[{:url => url, :bitly => short_url}] = title
       m.reply("#{title} | #{url_to_use} // #{m.user.nick}") if status == :ok
     end
-    output_file = $config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
+    output_file = Hink.config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
     write_output_to_file(output_file, file_output, m.channel.name)
   end
 
@@ -75,8 +75,8 @@ class UrlGrabber
   def bitlyfy(url)
     agent = Mechanize.new
     response_json = JSON.parse(agent.get("http://api.bitly.com/v3/shorten",
-      :login => $config[:bitly][:login],
-      :apiKey => $config[:bitly][:api_key],
+      :login => Hink.config[:bitly][:login],
+      :apiKey => Hink.config[:bitly][:api_key],
       :format => "json",
       :longUrl => url).body)
 
