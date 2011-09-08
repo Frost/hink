@@ -23,7 +23,7 @@ class GitHub
   end
 
   def self.extract_references(text)
-    references = text.scan(/gh:(?:(?!#)([^\/# ]+))?(?:\/([^# ]+))?(?:\#(\d+))?/)
+    references = text.scan(/(?:^|\s)gh:(?:(?!#)([^\/# ]+))?(?:\/([^# ]+))?(?:\#(\d+))?/)
     references.map{|r| {:account => r[0], :repo => r[1], :issue => (r[2].to_i if r[2])}}
   end
 
