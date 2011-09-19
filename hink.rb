@@ -19,4 +19,6 @@ bot = Cinch::Bot.new do
   end
 end
 
+Hink.setup(bot)
+
 bot.start
