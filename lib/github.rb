@@ -24,8 +24,11 @@ class GitHub
   end
 
   def self.extract_references(text)
-    references = text.scan(/(?:^|\s)gh:(?:(?!#)([^\/# ]+))?(?:\/([^# ]+))?(?:\#(\d+))?/)
-    references.map{|r| {:account => r[0], :repo => r[1], :issue => (r[2].to_i if r[2])}}
+    references = text.scan(/\bgh:([\da-zA-Z][-\da-zA-Z]*)(\/[-\da-zA-Z]+)?(#\d+|@[\da-fA-F]+)?\b/)
+    references.map{|r| {:account => r[0],
+                        :repo => (r[1][1..-1] if r[1]),
+                        :issue => (r[2][1..-1].to_i if r[2] and r[2].match(/^#/)),
+                        :commit => (r[2][1..-1]     if r[2] and r[2].match(/^@/))}}
   end
 
   def self.merge_reference_with_default(reference, channel)
@@ -34,7 +37,7 @@ class GitHub
     Hink.config[:github][channel.to_sym] ||= {}
 
     # Make the default hash complete
-    default = {:account => nil, :repo => nil, :issue => nil}.merge(Hink.config[:github][channel.to_sym])
+    default = {:account => nil, :repo => nil, :issue => nil, :commit => nil}.merge(Hink.config[:github][channel.to_sym])
 
     # Merge!
     #reference = default.merge(reference.select{|k,v| !v.nil?})
@@ -46,6 +49,8 @@ class GitHub
 
         if reference[:issue].nil?
           reference[:issue] = default[:issue]
+        elsif reference[:commit].nil?
+          reference[:commit] = default[:commit]
         end
       end
     end
@@ -62,6 +67,8 @@ class GitHub
 
       if reference[:issue]
         url += "/issues/#{reference[:issue]}"
+      elsif reference[:commit]
+        url += "/commit/#{reference[:commit]}"
       end
     end
 
