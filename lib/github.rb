@@ -2,7 +2,7 @@ require 'cinch'
 require 'htmlentities'
 require 'config'
 
-class GitHub
+class Github
   include Cinch::Plugin
 
   prefix ''
@@ -12,12 +12,12 @@ class GitHub
   def execute(m)
     bot.logger.debug("received github referrence(s): #{m.message}")
 
-    GitHub.extract_references(m.message).each do |reference|
-      reference = GitHub.merge_reference_with_default(reference, m.channel.name)
-      url = GitHub.reference_url(reference)
+    self.class.extract_references(m.message).each do |reference|
+      reference = self.class.merge_reference_with_default(reference, m.channel.name)
+      url = self.class.reference_url(reference)
       if not url.nil?
         title, status = UrlGrabber.extract_title bot.logger, url
-	title.gsub!(/ - GitHub$/, '')
+	title.gsub!(/ - Github$/, '')
         m.reply("#{m.user.nick}: #{url} - #{reference[:issue].nil? ? title : title.gsub(/ - Issues.*/, '')}")
       end
     end

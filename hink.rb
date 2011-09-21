@@ -4,11 +4,16 @@ require 'rubygems'
 require 'bundler/setup'
 require 'cinch'
 require 'yaml'
-require File.dirname(__FILE__) + '/lib/config.rb'
-# require plugins and libraries
-Dir.glob(File.dirname(__FILE__)+'/lib/*').each {|f| require f}
-
+$:<< File.dirname(__FILE__) + '/lib'
+require 'config'
+require 'helpers'
 include GrabberHelpers
+
+# require plugins and libraries
+Hink.config[:cinch][:plugins].map do |plugin|
+  require underscore(plugin)
+end
+
 
 bot = Cinch::Bot.new do
   configure do |c|
