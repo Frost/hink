@@ -1,5 +1,6 @@
 require 'cinch'
 require 'htmlentities'
+require 'config'
 
 class GitHub
   include Cinch::Plugin
