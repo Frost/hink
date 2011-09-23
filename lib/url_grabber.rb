@@ -25,9 +25,9 @@ class UrlGrabber
     extract_urls(message).each do |url|
       title,status = UrlGrabber.extract_title(bot.logger, url)
       short_url = bitlyfy(url) unless status == :error
-      url_to_use = (short_url == nil) ? url : short_url
+      url_to_use = short_url.nil? ? "" : "| #{short_url}"
       file_output[{:url => url, :bitly => short_url}] = title
-      m.reply("#{title} | #{url_to_use} // #{m.user.nick}") if status == :ok
+      m.reply("#{genitive(m.user.nick)} URL title: #{title} #{url_to_use}") if status == :ok
     end
     output_file = Hink.config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
     write_output_to_file(output_file, file_output, m.channel.name)
@@ -73,6 +73,7 @@ class UrlGrabber
   end
 
   def bitlyfy(url)
+    return nil unless Hink.config[:bitly]
     agent = Mechanize.new
     response_json = JSON.parse(agent.get("http://api.bitly.com/v3/shorten",
       :login => Hink.config[:bitly][:login],
@@ -117,4 +118,5 @@ class UrlGrabber
       end
     end
   end
+
 end
