@@ -9,5 +9,13 @@ module GrabberHelpers
     name.scan(/([A-Z][a-z]+)/) {|match| words << match[0].downcase}
     words.join('_')
   end
+
+  def genitive(nick)
+	 if nick[-1] == "s"
+	 	"#{nick}'"
+	 else
+	 	"#{nick}'s"
+	 end
+  end
 end
 
