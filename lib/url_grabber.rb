@@ -5,6 +5,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'htmlentities'
 require 'mechanize'
+require 'liquid'
 
 class UrlGrabber
   include Cinch::Plugin
@@ -25,9 +26,10 @@ class UrlGrabber
     extract_urls(message).each do |url|
       title,status = UrlGrabber.extract_title(bot.logger, url)
       short_url = bitlyfy(url) unless status == :error
-      url_to_use = short_url.nil? ? "" : "| #{short_url}"
+      url_to_use = short_url || ""
       file_output[{:url => url, :bitly => short_url}] = title
-      m.reply("#{genitive(m.user.nick)} URL title: #{title} #{url_to_use}") if status == :ok
+      output = Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
+      m.reply(output.render('url' => url_to_use, 'nick' => m.user.nick, 'title' => title)) if status == :ok
     end
     output_file = Hink.config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
     write_output_to_file(output_file, file_output, m.channel.name)

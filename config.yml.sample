@@ -14,6 +14,7 @@
   :api_key: "your_bitly_api_key_here"
 :url_grabber:
   :url_dir: "path/to/somewhere"
+  :output_format: "[{{ nick }}] {{ title }} - {{ url }}"
 :wiki_lookup:
   :url: "http://en.wikipedia.org/wiki/"
 :github:
