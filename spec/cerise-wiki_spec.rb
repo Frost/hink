@@ -1,7 +1,6 @@
-require 'cerise_wiki'
+require 'spec_helper'
+require 'wiki_lookup'
 
 describe WikiLookup do
-  it "passes" do
-    nil.should be_nil
-  end
+  it "needs some proper tests"
 end
