@@ -8,7 +8,7 @@ class WikiLookup
   match /\[\[(.*)\]\]/, :react_on => :channel
 
   def execute(m, term)
-    url = "#{Hink.config[:wiki_lookup][:url]}#{term}"
+    url = "#{Hink.config[:wiki_lookup][:url]}#{underscore term}"
     agent = Mechanize.new
     page = agent.get(url)
     page_title = Nokogiri::HTML(page.body).at_css('title').content
