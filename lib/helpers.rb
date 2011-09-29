@@ -5,9 +5,14 @@ module GrabberHelpers
   end
 
   def underscore(name)
-    words = []
-    name.scan(/([A-Z][a-z]+)/) {|match| words << match[0].downcase}
-    words.join('_')
+    name = name.gsub(' ','_')
+    if name  =~ /[A-Z]/
+      words = []
+      name.scan(/([A-Z][a-z]+)/) {|match| words << match[0].downcase}
+      return words.join('_')
+    else
+      return name
+    end
   end
 
   def genitive(nick)
