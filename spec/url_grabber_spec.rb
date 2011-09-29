@@ -1,4 +1,5 @@
-require 'url-grabber'
+require 'spec_helper'
+require 'url_grabber'
 
 describe UrlGrabber do
   describe "extract_urls" do
@@ -13,7 +14,7 @@ describe UrlGrabber do
     it "should handle linebreaks" do
       UrlGrabber.sanitize_title("a\nb").should == "a b"
       UrlGrabber.sanitize_title(" a\nb ").should == "a b"
-      UrlGrabber.sanitize_title(" a\n\n\nb ").should == "a   b"
+      UrlGrabber.sanitize_title(" a\n\n\nb ").should == "a b"
       UrlGrabber.sanitize_title("\nab\n").should == "ab"
       UrlGrabber.sanitize_title("\n\n\nab\n\n\n").should == "ab"
     end
@@ -21,7 +22,7 @@ describe UrlGrabber do
     it "should handle whitespace" do
       UrlGrabber.sanitize_title("a b").should == "a b"
       UrlGrabber.sanitize_title(" a b ").should == "a b"
-      UrlGrabber.sanitize_title("   a   b   ").should == "a   b"
+      UrlGrabber.sanitize_title("   a   b   ").should == "a b"
     end
   end
 
