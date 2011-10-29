@@ -4,7 +4,6 @@ gem 'cinch'
 gem 'nokogiri'
 gem 'htmlentities'
 gem 'mechanize'
-gem 'rspec'
 gem 'liquid'
 
 group :datamapper do # used for Quotes plugin
@@ -21,6 +20,7 @@ group :sqlite do
 end
 
 group :development do
+  gem 'rspec'
   gem 'guard'
   gem 'guard-bundler'
   gem 'guard-rspec'
