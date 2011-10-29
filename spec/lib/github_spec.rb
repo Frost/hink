@@ -34,78 +34,155 @@ describe Github do
     end
   end
 
-  context "prepare_query" do
+  describe "prepare_query" do
     def m
       OpenStruct.new(channel: OpenStruct.new(name: "#test-hink"))
     end
 
-    before(:each) do
-      Hink.stub(:config).and_return({github: {channels: {"#test-hink".to_sym => {}}}})
+    context "without proper channel conf" do
+      before(:each) do
+        Hink.stub(:config).and_return({github: {channels: {}}})
+      end
+
+      describe "missing user" do
+        subject do
+          Github.prepare_query(m, {})
+        end
+
+        it "has query_type :none" do
+          subject[:query_type].should == :none
+        end
+      end
+
+      describe "user queries" do
+        subject do
+          Github.prepare_query(m, user: "Frost")
+        end
+
+        it "calculates proper query type" do
+          subject[:query_type].should == :user
+        end
+
+        it "calculates proper user name" do
+          subject[:user].should == "Frost"
+        end
+
+      end
+
+      describe "repo queries" do
+        subject do
+          Github.prepare_query(m, user: "Frost", repo: "/hink")
+        end
+
+        it "calculates proper query type" do
+          subject[:query_type].should == :repo
+        end
+
+        it "calculates proper user name" do
+          subject[:user].should == "Frost"
+        end
+
+        it "calculates proper repo name" do
+          subject[:repo].should == "hink"
+        end
+      end
+
+      describe "commit queries" do
+        subject do
+          Github.prepare_query(m, user: "Frost", repo: "/hink", issue_or_commit: "@06921b39")
+        end
+
+        it "calculates proper query type" do
+          subject[:query_type].should == :commit
+        end
+
+        it "calculates proper user name" do
+          subject[:user].should == "Frost"
+        end
+
+        it "calculates proper repo name" do
+          subject[:repo].should == "hink"
+        end
+
+        it "calculates proper commit sha hash" do
+          subject[:commit].should == "06921b39"
+        end
+      end
+
+
+    end
+    
+    context "with proper channel conf" do
+      before(:each) do
+        Hink.stub(:config).and_return({github: {channels: {"#test-hink".to_sym => {}}}})
+      end
+
+      describe "missing user" do
+        subject do
+          Github.prepare_query(m, {})
+        end
+
+        it "has query_type :none" do
+          subject[:query_type].should == :none
+        end
+      end
+
+      describe "user queries" do
+        subject do
+          Github.prepare_query(m, user: "Frost")
+        end
+
+        it "calculates proper query type" do
+          subject[:query_type].should == :user
+        end
+
+        it "calculates proper user name" do
+          subject[:user].should == "Frost"
+        end
+
+      end
+
+      describe "repo queries" do
+        subject do
+          Github.prepare_query(m, user: "Frost", repo: "/hink")
+        end
+
+        it "calculates proper query type" do
+          subject[:query_type].should == :repo
+        end
+
+        it "calculates proper user name" do
+          subject[:user].should == "Frost"
+        end
+
+        it "calculates proper repo name" do
+          subject[:repo].should == "hink"
+        end
+      end
+
+      describe "commit queries" do
+        subject do
+          Github.prepare_query(m, user: "Frost", repo: "/hink", issue_or_commit: "@06921b39")
+        end
+
+        it "calculates proper query type" do
+          subject[:query_type].should == :commit
+        end
+
+        it "calculates proper user name" do
+          subject[:user].should == "Frost"
+        end
+
+        it "calculates proper repo name" do
+          subject[:repo].should == "hink"
+        end
+
+        it "calculates proper commit sha hash" do
+          subject[:commit].should == "06921b39"
+        end
+      end
     end
 
-    describe "missing user" do
-      subject do
-        Github.prepare_query(m, {})
-      end
-
-      it "has query_type :none" do
-        subject[:query_type].should == :none
-      end
-    end
-
-    describe "user queries" do
-      subject do
-        Github.prepare_query(m, user: "Frost")
-      end
-
-      it "calculates proper query type" do
-        subject[:query_type].should == :user
-      end
-
-      it "calculates proper user name" do
-        subject[:user].should == "Frost"
-      end
-    end
-
-    describe "repo queries" do
-      subject do
-        Github.prepare_query(m, user: "Frost", repo: "/hink")
-      end
-
-      it "calculates proper query type" do
-        subject[:query_type].should == :repo
-      end
-
-      it "calculates proper user name" do
-        subject[:user].should == "Frost"
-      end
-
-      it "calculates proper repo name" do
-        subject[:repo].should == "hink"
-      end
-    end
-
-    describe "commit queries" do
-      subject do
-        Github.prepare_query(m, user: "Frost", repo: "/hink", issue_or_commit: "@06921b39")
-      end
-
-      it "calculates proper query type" do
-        subject[:query_type].should == :commit
-      end
-
-      it "calculates proper user name" do
-        subject[:user].should == "Frost"
-      end
-
-      it "calculates proper repo name" do
-        subject[:repo].should == "hink"
-      end
-
-      it "calculates proper commit sha hash" do
-        subject[:commit].should == "06921b39"
-      end
-    end
 
     describe "issue queries" do
       subject do

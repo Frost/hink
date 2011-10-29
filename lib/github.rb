@@ -44,7 +44,8 @@ class Github
     # and calculate what api to perform the query against.
     # Outputs query_type: :none if the options aren't suitable.
     def prepare_query(m, options = {})
-      options = Hink.config[:github][:channels][m.channel.name.to_sym].merge(options)
+      channel_defaults = Hink.config[:github][:channels][m.channel.name.to_sym] || {}
+      options = channel_defaults.merge(options)
 
       query_type = if options[:user]
         if options[:repo]
