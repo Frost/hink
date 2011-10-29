@@ -11,13 +11,13 @@ class Quote
   include DataMapper::Resource
 
   property :id,         Serial
-  property :added_by,   String,   required: true
-  property :user,       String,   required: true
-  property :host,       String,   required: true
-  property :channel,    String,   required: true
+  property :added_by,   String,   required: true, default: ''
+  property :user,       String,   required: true, default: ''
+  property :host,       String,   required: true, default: ''
+  property :channel,    String,   required: true, default: ''
   property :created_at, DateTime
   property :updated_at, DateTime
-  property :quote,      Text,     required: true, lazy: false
+  property :quote,      Text,     required: true, lazy: false, default: ''
 end
 Quote.auto_upgrade!
 
