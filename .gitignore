@@ -17,3 +17,4 @@ config.yml
 Session.vim
 *.html
 quotes.db
+*.db
