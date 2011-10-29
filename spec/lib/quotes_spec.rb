@@ -7,7 +7,7 @@ def valid_attributes
     added_by: "Frost",
     user: "frost",
     host: "ceri.se",
-    channel: "test-hink",
+    channel: "#test-hink",
     quote: "<Frost> Some random boring made-up self-quote"
   }
 end
@@ -19,7 +19,7 @@ def valid_parameters
       user: "frost",
       host: "ceri.se"
     ),
-    channel: "hink-test"
+    channel: "#test-hink"
   )
   return m, "<Frost> Some random boring made-up self-quote"
 end
@@ -65,7 +65,7 @@ describe Quotes do
         q = Quote.create(valid_attributes.merge(:quote => i.to_s))
       end
 
-      @m = OpenStruct.new(:channel => "test-hink")
+      @m = OpenStruct.new(:channel => "#test-hink")
     end
 
     context "without filter" do
@@ -86,7 +86,7 @@ describe Quotes do
     end
 
     after(:all) do
-      Quote.all(:channel => "test-hink").destroy
+      Quote.all(:channel => "#test-hink").destroy
     end
 
   end
