@@ -1,77 +1,109 @@
 require 'cinch'
 require 'htmlentities'
 require 'config'
+require 'httparty'
+require 'json'
 
 class Github
   include Cinch::Plugin
 
+  # The DEFAULTS[:output_template] is just a default Liquid output template.
+  # It can be overridden in config.yml by defining the github.output_format key.
+  #
+  # The DEFAULTS[:github_regex] regex matches some github resource
+  # It consists basically of three catching groups, none of which are actually necessary.
+  # The three groups are:
+  # - user
+  # - repo
+  # - issue_or_commit
+  # A vaild github username contains alphanumeric characters and/or dashes, and does not start with a dash.
+  # Same thing goes for the repo
+  # The issue_or_commit part either points to an issue or commit, depending on how it looks:
+  # - #1234     -- points to an issue
+  # - @01234567 -- points to a commit
+  DEFAULTS = {
+    output_template: "[GitHub] {{ title }} | {{ url }}",
+    github_regex: /\bgh:([a-z][\-\da-z]+)?(\/[a-z][\-\da-z]+)?(#\d+|@[\da-z]+)?\b/i
+  }
+
   prefix ''
-  match /gh:([^ ]+)/, :method => :execute
+  match DEFAULTS[:github_regex], method: :execute
   react_on :channel
 
-  def execute(m)
-    bot.logger.debug("received github referrence(s): #{m.message}")
-
-    self.class.extract_references(m.message).each do |reference|
-      reference = self.class.merge_reference_with_default(reference, m.channel.name)
-      url = self.class.reference_url(reference)
-      if not url.nil?
-        title, status = UrlGrabber.extract_title bot.logger, url
-	title.gsub!(/ - Github$/, '')
-        m.reply("#{m.user.nick}: #{url} - #{reference[:issue].nil? ? title : title.gsub(/ - Issues.*/, '')}")
-      end
+  def execute(m, user, repo, issue_or_commit)
+    query_options = self.class.prepare_query(m, user: user, repo: repo, issue_or_commit: issue_or_commit)
+    unless query_options[:query_type] == :none
+      response_hash = self.class.perform_query(query_options)
+      m.reply(self.class.compile_output(response_hash))
     end
   end
 
-  def self.extract_references(text)
-    references = text.scan(/\bgh:([\da-zA-Z][-\da-zA-Z]*)(\/[-\da-zA-Z]+)?(#\d+|@[\da-fA-F]+)?\b/)
-    references.map{|r| {:account => r[0],
-                        :repo => (r[1][1..-1] if r[1]),
-                        :issue => (r[2][1..-1].to_i if r[2] and r[2].match(/^#/)),
-                        :commit => (r[2][1..-1]     if r[2] and r[2].match(/^@/))}}
-  end
+  class << self
+    ##
+    # Take a bunch of input (user, repo, issue, commit) 
+    # and calculate what api to perform the query against.
+    # Outputs query_type: :none if the options aren't suitable.
+    def prepare_query(m, options = {})
+      options = Hink.config[:github][:channels][m.channel.name.to_sym].merge(options)
 
-  def self.merge_reference_with_default(reference, channel)
-    # Create config hashes if not already defined
-    Hink.config[:github] ||= {}
-    Hink.config[:github][channel.to_sym] ||= {}
-
-    # Make the default hash complete
-    default = {:account => nil, :repo => nil, :issue => nil, :commit => nil}.merge(Hink.config[:github][channel.to_sym])
-
-    # Merge!
-    #reference = default.merge(reference.select{|k,v| !v.nil?})
-    if reference[:account].nil?
-      reference[:account] = default[:account]
-
-      if reference[:repo].nil?
-        reference[:repo] = default[:repo]
-
-        if reference[:issue].nil?
-          reference[:issue] = default[:issue]
-        elsif reference[:commit].nil?
-          reference[:commit] = default[:commit]
+      query_type = if options[:user]
+        if options[:repo]
+          options[:repo].gsub!(/^\//, '')
+          case options[:issue_or_commit]
+          when /^#/
+            options[:issue] = options[:issue_or_commit].gsub(/^#/, '')
+            :issue
+          when /^@/
+            options[:commit] = options[:issue_or_commit].gsub(/^@/, '')
+            :commit
+          else :repo
+          end
+        else
+          :user
         end
+      else
+        :none
       end
+      
+      options.merge(query_type: query_type)
     end
 
-    reference
-  end
-
-  def self.reference_url(reference)
-    return if reference[:account].nil?
-    url = "https://github.com/#{reference[:account]}"
-
-    if reference[:repo]
-      url += "/#{reference[:repo]}"
-
-      if reference[:issue]
-        url += "/issues/#{reference[:issue]}"
-      elsif reference[:commit]
-        url += "/commit/#{reference[:commit]}"
-      end
+    def perform_query(options)
+      query_type = options.delete(:query_type)      
+      self.send("#{query_type}_query", options)
     end
 
-    url
+    def user_query(options = {})
+      json = HTTParty.get("https://api.github.com/users/#{options[:user]}").body
+      json = JSON.load(json)
+      {'title' => json['name'], 'url' => json['html_url']}
+    end
+
+    def repo_query(options = {})
+      json = HTTParty.get("https://api.github.com/repos/#{options[:user]}/#{options[:repo]}").body
+      json = JSON.load(json)
+      {'title' => "#{json['owner']['login']}/#{json['name']}", 'url' => json['html_url']}
+    end
+
+    def commit_query(options = {})
+      url = "https://github.com/#{options[:user]}/#{options[:repo]}/commit/#{options[:commit]}"
+      json = HTTParty.get("#{url}.json").body
+      json = JSON.load(json)
+      {'title' => "(#{json['commit']['author']['name']}) #{json['commit']['message']}", 'url' => url}
+    end
+
+    def issue_query(options = {})
+      json = HTTParty.get("https://api.github.com/repos/#{options[:user]}/#{options[:repo]}/issues/#{options[:issue]}").body
+      json = JSON.load(json)
+      {'title' => "##{json['number']} - #{json['title']}", 'url' => json['html_url']}
+    end
+
+    ##
+    # Take a hash with two keys and compile the output string using a liquid template
+    # response_hash should be something like {'title' => 'foo bar baz', 'url' => 'https://foo.bar.baz'}
+    def compile_output(response_hash)
+      template = Hink.config[:github][:output_format] || DEFAULTS[:output_template]
+      Liquid::Template.parse(template).render(response_hash)
+    end
   end
 end
