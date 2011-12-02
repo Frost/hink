@@ -18,6 +18,8 @@
 :wiki_lookup:
   :url: "http://en.wikipedia.org/wiki/"
 :github:
-  :"#channel":
-    :repo: "url-grabber"
-    :account: "user"
+  :output_format: "[GitHub] {{ title }} - {{ url }}"
+  :channels:
+    :"#channel":
+      :repo: "url-grabber"
+      :account: "user"
