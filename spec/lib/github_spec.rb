@@ -208,25 +208,61 @@ describe Github do
   end
 
   describe "query methods" do
+    before(:all) do
+      include WebMock::API
+    end
+
     it "performs issue queries" do
+      stub_request(:get, "https://api.github.com/repos/Frost/hink/issues/24").to_return(
+        status: 200,
+        body: {
+          number: '24', 
+          title: 'Add custom output formats for sites to UrlGrabber plugin', 
+          html_url: 'https://github.com/Frost/hink/issues/24'
+        }.to_json
+      )
       hash = Github.perform_query(query_type: :issue, user: "Frost", repo: "hink",issue: "24")
       hash['url'].should == "https://github.com/Frost/hink/issues/24"
       hash['title'].should == "#24 - Add custom output formats for sites to UrlGrabber plugin"
     end
 
     it "performs commit queries" do
+      stub_request(:get, "https://github.com/Frost/hink/commit/06921b39.json").to_return(
+        status: 200,
+        body: {
+          commit: {
+            author: {name: "Martin Frost"},
+            message: "moved rspec to development group in gemfile"
+          }
+        }.to_json
+      )
       hash = Github.perform_query(query_type: :commit, user: "Frost", repo: "hink", commit: "06921b39")
       hash['url'].should == "https://github.com/Frost/hink/commit/06921b39"
       hash['title'].should == "(Martin Frost) moved rspec to development group in gemfile"
     end
 
     it "performs repo queries" do
+      stub_request(:get, "https://api.github.com/repos/Frost/hink").to_return(
+        status: 200,
+        body: {
+          owner: {login: "Frost"},
+          name: "hink",
+          html_url: "https://github.com/Frost/hink"
+        }.to_json
+      )
       hash = Github.perform_query(query_type: :repo, user: "Frost", repo: "hink")
       hash['url'].should == "https://github.com/Frost/hink"
       hash['title'].should == "Frost/hink"
     end
 
     it "performs user queries" do
+      stub_request(:get, "https://api.github.com/users/Frost").to_return(
+        status: 200,
+        body: {
+          name: 'Martin Frost',
+          html_url: 'https://github.com/Frost'
+        }.to_json
+      )
       hash = Github.perform_query(query_type: :user, user: "Frost")
       hash['url'].should == "https://github.com/Frost"
       hash['title'].should == "Martin Frost"
