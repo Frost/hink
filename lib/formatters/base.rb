@@ -20,7 +20,7 @@ module Formatters
     end
 
     def self.parse(uri, template)
-      instance = self.class.new(uri, template)
+      instance = new(uri, template)
       instance.perform_request!
       instance.parse_response!
       instance.to_s

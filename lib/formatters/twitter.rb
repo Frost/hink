@@ -7,6 +7,7 @@ require "liquid"
 module Formatters
   class Twitter < Base
     attr_reader :tweet_id, :user, :tweet_text
+    FORMAT = %r{^https?://(?:www\.)?twitter.com/(?:#!/)?([A-Za-z0-9]+)/status/(\d+)}
 
     def initialize(uri, template = "")
       super
@@ -14,15 +15,14 @@ module Formatters
     end
 
     def extract_info
-      tweet_regex = %r{^https?://(?:www\.)?twitter.com/(?:#!/)?([a-z0-9]+)/status/(\d+)}
-      if @uri =~ tweet_regex
+      if @uri =~ FORMAT
         return $1, $2
       end
     end
 
     def perform_request!
       agent = Mechanize.new
-      response = agent.get("http://api.twitter.com/1/statuses/show/125580490223783937.json")
+      response = agent.get("http://api.twitter.com/1/statuses/show/#{@tweet_id}.json")
       @response = JSON.load(response.body)
     end
 
