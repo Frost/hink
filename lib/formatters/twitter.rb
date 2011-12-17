@@ -5,24 +5,12 @@ require "mechanize"
 require "liquid"
 
 module Formatters
-  class Twitter
-    attr_reader :uri, :response, :tweet_id, :user, :tweet_text
+  class Twitter < Base
+    attr_reader :tweet_id, :user, :tweet_text
 
     def initialize(uri, template = "")
-      @uri = uri
-      @template = template
+      super
       @user, @tweet_id = extract_info
-    end
-
-    def parse_response!
-      @tweet_text = response['text']
-    end
-
-    def perform_request!
-      agent = Mechanize.new
-      response = agent.get("http://api.twitter.com/1/statuses/show/125580490223783937.json")
-      @response = JSON.load(response.body)
-      
     end
 
     def extract_info
@@ -30,6 +18,16 @@ module Formatters
       if @uri =~ tweet_regex
         return $1, $2
       end
+    end
+
+    def perform_request!
+      agent = Mechanize.new
+      response = agent.get("http://api.twitter.com/1/statuses/show/125580490223783937.json")
+      @response = JSON.load(response.body)
+    end
+
+    def parse_response!
+      @tweet_text = response['text']
     end
 
     def to_s
