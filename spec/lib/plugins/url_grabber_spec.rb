@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'url_grabber'
+require 'plugins/url_grabber'
 
 describe UrlGrabber do
   describe "extract_urls" do

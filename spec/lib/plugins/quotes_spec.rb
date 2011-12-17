@@ -1,5 +1,5 @@
 require "spec_helper"
-require 'quotes'
+require 'plugins/quotes'
 require "ostruct"
 
 def valid_attributes

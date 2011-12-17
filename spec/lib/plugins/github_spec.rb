@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'github'
+require 'plugins/github'
 
 describe Github do
   context "DEFAULTS" do
