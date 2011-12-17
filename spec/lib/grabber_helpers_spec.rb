@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'helpers'
+require 'grabber_helpers'
 
 describe GrabberHelpers do
   before(:all) do
