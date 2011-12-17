@@ -14,9 +14,12 @@
   :api_key: "your_bitly_api_key_here"
 :url_grabber:
   :url_dir: "path/to/somewhere"
-  :output_format: "[{{ nick }}] {{ title }} - {{ url }}"
+  :output_format: "{{ nick }}: {{ content }} | {{ url }}"
   :formatters:
-    :twitter: "[{{type}}] @{{user}}: {{tweet}}"
+    :url: "[{{ type }}] {{ title }}"
+    :twitter: "[{{ type }}] @{{ user }}: {{ tweet }}"
+    :spotify: "[{{ type }}] {{ artist }} - {{ song }}"
+
 :wiki_lookup:
   :url: "http://en.wikipedia.org/wiki/"
 :github:

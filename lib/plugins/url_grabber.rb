@@ -6,6 +6,9 @@ require 'nokogiri'
 require 'htmlentities'
 require 'mechanize'
 require 'liquid'
+require 'helpers/uri'
+require "formatters/url"
+require "formatters/twitter"
 
 class UrlGrabber
   include Cinch::Plugin
@@ -16,7 +19,9 @@ class UrlGrabber
 
   def execute(m)
     # don't reply to urls posted by self
-    return if m.user.nick == Hink.config[:cinch][:nick]
+    if m.user.nick == Hink.config[:cinch][:nick]
+      return 
+    end
 
     # remove all non-printable characters
     message = m.message.scan(/[[:print:]]/).join
@@ -24,12 +29,15 @@ class UrlGrabber
     bot.logger.debug("received url(s): #{message}")
     file_output = {}
     extract_urls(message).each do |url|
-      title,status = UrlGrabber.extract_title(bot.logger, url)
-      short_url = bitlyfy(url) unless status == :error
-      url_to_use = short_url || ""
-      file_output[{:url => url, :bitly => short_url}] = title
-      output = Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
-      m.reply(output.render('url' => url_to_use, 'nick' => m.user.nick, 'title' => title)) if status == :ok
+      title = self.class.extract_title(bot.logger,url)
+
+      if title
+        short_url = bitlyfy(url)
+        file_output[{:url => url, :bitly => short_url}] = title
+        output = Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
+        m.reply(output.render('url' => short_url, 'nick' => m.user.nick, 'content' => title))
+      end
+
     end
     output_file = Hink.config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
     write_output_to_file(output_file, file_output, m.channel.name)
@@ -45,32 +53,9 @@ class UrlGrabber
 
   def self.extract_title(logger, url)
     logger.debug("extracting title for #{url}")
-    agent = Mechanize.new
-    begin
-      headers = agent.head(url)
-      logger.debug(headers.content_type)
-      return nil, :not_html unless headers.content_type =~ %r{text/html}
-    
-      title = Nokogiri::HTML(agent.get(url).body).at_css("title").content
-      return nil, :no_title if title.nil?
-
-      title = UrlGrabber.sanitize_title(title)
-      
-      logger.debug("found #{title}")
-      return title, :ok
-
-    rescue Mechanize::ResponseCodeError => e
-      ending_crap = /['\)\",.\/]$/
-
-      if e.response_code.to_i == 404 && url =~ ending_crap
-        url = url.gsub(ending_crap, '')
-        retry
-      else
-        return e.to_s, :broken
-      end
-    rescue => e
-      puts e.class, e.message, e.backtrace
-      return nil, :error
+    uri = Helpers::Uri.new(url)
+    if uri.valid?
+      return uri.render!
     end
   end
 
