@@ -6,12 +6,13 @@ require 'cinch'
 require 'yaml'
 $:<< File.dirname(__FILE__) + '/lib'
 require 'config'
-require 'helpers'
+require 'grabber_helpers'
 include GrabberHelpers
 
 # require plugins and libraries
 Hink.config[:cinch][:plugins].map do |plugin|
-  require underscore(plugin)
+  plugin_file = "plugins/#{underscore(plugin)}"
+  require plugin_file
 end
 
 
