@@ -15,6 +15,8 @@
 :url_grabber:
   :url_dir: "path/to/somewhere"
   :output_format: "[{{ nick }}] {{ title }} - {{ url }}"
+  :formatters:
+    :twitter: "[{{type}}] @{{user}}: {{tweet}}"
 :wiki_lookup:
   :url: "http://en.wikipedia.org/wiki/"
 :github:
