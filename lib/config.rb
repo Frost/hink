@@ -12,5 +12,9 @@ class Hink
   def self.bot
     @@bot
   end
+
+  def self.setup_database
+    DataMapper.setup(:default, "sqlite://#{File.dirname(__FILE__)}/../hink.sqlite3")
+  end
 end
 

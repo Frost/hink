@@ -5,7 +5,7 @@ require 'dm-validations'
 require "dm-timestamps"
 require "dm-aggregates"
 
-DataMapper.setup(:default, "sqlite://#{File.dirname(__FILE__)}/../../quotes.db")
+Hink.setup_database
 
 class Quote
   include DataMapper::Resource
