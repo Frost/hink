@@ -18,3 +18,4 @@ Session.vim
 *.html
 quotes.db
 *.db
+*.sqlite3
