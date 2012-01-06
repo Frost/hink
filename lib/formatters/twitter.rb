@@ -31,7 +31,6 @@ module Formatters
     end
 
     def to_s
-      puts @tweet_text
       Liquid::Template.parse(@template).render('type' => "Twitter", 'user' => @user, 'tweet' => @tweet_text)
     end
 
