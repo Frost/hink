@@ -7,7 +7,7 @@ require "liquid"
 module Formatters
   class Twitter < Base
     attr_reader :tweet_id, :user, :tweet_text
-    FORMAT = %r{^https?://(?:www\.)?twitter.com/(?:#!/)?([A-Za-z0-9_]+)/status/(\d+)}
+    FORMAT = %r{^https?://(?:www|mobile)?\.?twitter.com/(?:#!/)?([A-Za-z0-9_]+)/status/(\d+)}
 
     def initialize(uri, template = "")
       super
