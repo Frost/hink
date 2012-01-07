@@ -19,7 +19,6 @@
     :url: "[{{ type }}] {{ title }}"
     :twitter: "[{{ type }}] @{{ user }}: {{ tweet }}"
     :spotify: "[{{ type }}] {{ artist }} - {{ song }}"
-
 :wiki_lookup:
   :url: "http://en.wikipedia.org/wiki/"
 :github:
@@ -28,3 +27,7 @@
     :"#channel":
       :repo: "url-grabber"
       :account: "user"
+:feed:
+  :uri: http://news.example.com
+  :interval: 5
+  :template: "[{{ type }}] {{ title }} | {{ link }}"
