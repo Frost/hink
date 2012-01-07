@@ -1,4 +1,3 @@
-require "cinch"
 require "mechanize"
 require "liquid"
 require "nokogiri"

@@ -1,5 +1,4 @@
 # coding: utf-8
-require "cinch"
 require "json"
 require "mechanize"
 require "liquid"
