@@ -28,6 +28,7 @@
       :repo: "url-grabber"
       :account: "user"
 :feed:
-  :uri: http://news.example.com
+  :uris: 
+  - http://news.example.com
   :interval: 5
   :template: "[{{ type }}] {{ title }} | {{ link }}"

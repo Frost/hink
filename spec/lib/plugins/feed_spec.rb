@@ -1,17 +1,11 @@
 require 'spec_helper'
 require 'liquid'
 
-module Formatters
-  class Feed; 
-    def initialize(*args);end
-    def parse_response!;end
-    def to_s;end
-  end
-end
+require "formatters/feed"
 require 'plugins/feed'
 
 describe Feed do
-
+  let(:feed_url) { "http://news.example.com" }
   let(:feed_template) {
     %(
       <rss version="2.0">
@@ -36,6 +30,12 @@ describe Feed do
 
   subject do
     Feed.new
+  end
+
+  before(:all) do
+    Formatters::Feed.stub(:initialize)
+    Formatters::Feed.stub(:parse_response!)
+    Formatters::Feed.stub(:to_s)
   end
   
   describe "interval" do
@@ -63,13 +63,13 @@ describe Feed do
 
       it "tries to parse that post" do
         Formatters::Feed.any_instance.should_receive(:'parse_response!')
-        Feed.check_news
+        Feed.check_news(feed_url)
       end
 
       it "renders correct output" do
         Formatters::Feed.any_instance.should_receive(:'parse_response!')
         Formatters::Feed.any_instance.should_receive(:to_s).and_return(item_output)
-        Feed.check_news.should == [item_output]
+        Feed.check_news(feed_url).should == [item_output]
       end
 
     end
@@ -85,7 +85,7 @@ describe Feed do
       end
 
       it "returns nothing" do
-        Feed.check_news.should == []
+        Feed.check_news(feed_url).should == []
       end
     end
   end

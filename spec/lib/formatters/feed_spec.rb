@@ -25,8 +25,9 @@ describe Formatters::Feed do
   subject { Formatters::Feed.new(item, template) }
 
   context "initialize" do
-    it "sets the @uri attribute" do
-      subject.item.should == item
+    it "sets the @item attribute" do
+      feed = Formatters::Feed.new(item, template)
+      feed.item.should == item
     end
   end
 

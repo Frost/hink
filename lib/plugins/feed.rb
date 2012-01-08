@@ -11,18 +11,23 @@ class Feed
 
   def check_news
     Hink.bot.logger.debug("checking news")
-    news = self.class.check_news
+    uris = Hink.config[:feed][:uris]
+    news = []
 
-    news.each do |item|
+    uris.each do |uri|
+      news << self.class.check_news(uri)
+    end
+
+    news.flatten.each do |item|
       Hink.bot.channels.map do |c|
         c.send(item)
       end
     end
   end
 
-  def self.check_news
+  def self.check_news(uri)
     agent = Mechanize.new
-    feed = agent.get(Hink.config[:feed][:uri]).body
+    feed = agent.get(uri).body
     rss = RSS::Parser.parse(feed)
     threshold = (Time.now - 60*Hink.config[:feed][:interval].to_i).utc
     items = rss.items.select do |i| 
