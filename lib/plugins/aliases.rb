@@ -31,7 +31,7 @@ class Aliases
   react_on :channel
 
   def search_alias(m, trigger)
-    a = Alias.get(trigger)
+    a = Alias.get(trigger.downcase)
     if a
       m.reply("#{m.user.nick}: #{a.target}")
     end
@@ -43,7 +43,7 @@ class Aliases
       user: m.user.user,
       host: m.user.host,
       channel: m.channel,
-      trigger: trigger,
+      trigger: trigger.downcase,
       target: target
     )
     if new_alias.save
