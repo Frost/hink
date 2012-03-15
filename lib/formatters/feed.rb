@@ -1,6 +1,7 @@
 require "mechanize"
 require "liquid"
 require "rss"
+require "htmlentities"
 
 module Formatters
   class Feed
@@ -13,8 +14,9 @@ module Formatters
 
     def parse_response!
       @item = Nokogiri::XML(@item)
-      @title =  @item.css('title').first.inner_html
-      @author = @item.css('author').first.inner_html
+      coder = HTMLEntities.new
+      @title = coder.decode(@item.css('title').first.inner_html)
+      @author = coder.decode(@item.css('author').first.inner_html)
       @link = @item.css('link').first.inner_html
     end
 
