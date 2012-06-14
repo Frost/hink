@@ -43,6 +43,30 @@ describe Quote do
       end
     end
   end
+
+  describe "deletion paranoia" do
+    before(:each) do
+      @q = Quote.create(valid_attributes)
+    end
+
+    it "sets the deleted_at attribute" do
+      @q.destroy
+
+      @q.deleted_at.should_not be_nil
+    end
+
+    it "doesn't actually remove the quote" do
+      @q.destroy
+
+      repository(:default).adapter.select("SELECT * from quotes WHERE id = #{@q.id}").should_not be_empty
+    end
+
+    it "doesn't show up in an ordinary query" do
+      @q.destroy
+
+      Quote.all.should_not include(@q)
+    end
+  end
 end
 
 
@@ -86,7 +110,7 @@ describe Quotes do
     end
 
     after(:all) do
-      Quote.all(:channel => "#test-hink").destroy
+      repository(:default).adapter.execute("delete from quotes where channel = '#test-hink'")
     end
 
   end

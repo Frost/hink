@@ -14,6 +14,7 @@ group :datamapper do # used for Quotes plugin
   gem 'dm-validations'
   gem 'dm-timestamps'
   gem 'dm-aggregates'
+  gem 'dm-types'
 end
 
 group :sqlite do

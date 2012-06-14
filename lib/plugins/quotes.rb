@@ -4,6 +4,7 @@ require 'dm-migrations'
 require 'dm-validations'
 require "dm-timestamps"
 require "dm-aggregates"
+require 'dm-types'
 
 Hink.setup_database
 
@@ -18,6 +19,8 @@ class Quote
   property :created_at, DateTime
   property :updated_at, DateTime
   property :quote,      Text,     required: true, lazy: false, default: ''
+  property :deleted_at, DataMapper::Property::ParanoidDateTime,  required: false
+
 end
 Quote.auto_upgrade!
 
