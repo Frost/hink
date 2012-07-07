@@ -33,7 +33,6 @@ describe Feed do
   end
 
   before(:all) do
-    Formatters::Feed.stub(:initialize)
     Formatters::Feed.stub(:parse_response!)
     Formatters::Feed.stub(:to_s)
   end
