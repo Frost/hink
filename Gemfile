@@ -22,7 +22,7 @@ group :sqlite do
   gem 'dm-sqlite-adapter'
 end
 
-group :development, :test do
+group :development do
   gem 'rspec'
   gem 'guard'
   gem 'guard-bundler'
@@ -30,5 +30,10 @@ group :development, :test do
   gem 'rb-fsevent', require: false
   gem 'rb-inotify', require: false
   gem 'rb-fchange', require: false
+  gem 'webmock'
+end
+
+group :test do
+  gem 'rspec'
   gem 'webmock'
 end
