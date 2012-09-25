@@ -2,7 +2,7 @@ require "mechanize"
 require "liquid"
 require "nokogiri"
 require "htmlentities"
-require "formatters/base"
+require_relative 'base.rb'
 
 module Formatters
   class Url < Base

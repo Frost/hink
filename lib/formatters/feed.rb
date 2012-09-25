@@ -2,6 +2,7 @@ require "mechanize"
 require "liquid"
 require "rss"
 require "htmlentities"
+require_relative 'base.rb'
 
 module Formatters
   class Feed

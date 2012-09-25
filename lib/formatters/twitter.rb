@@ -2,6 +2,7 @@
 require "json"
 require "mechanize"
 require "liquid"
+require_relative 'base.rb'
 
 module Formatters
   class Twitter < Base
