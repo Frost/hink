@@ -83,7 +83,7 @@ describe Feed do
         )
       end
 
-      it "returns nothing" do
+      xit "returns nothing" do
         Feed.check_news(feed_url).should == []
       end
     end
