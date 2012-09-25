@@ -1,7 +1,7 @@
 require 'cinch'
 require 'htmlentities'
 require 'config'
-require 'httparty'
+require 'mechanize'
 require 'json'
 
 class Github
@@ -77,26 +77,30 @@ class Github
     end
 
     def user_query(options = {})
-      json = HTTParty.get("https://api.github.com/users/#{options[:user]}").body
+      agent = Mechanize.new
+      json = agent.get("https://api.github.com/users/#{options[:user]}").body
       json = JSON.load(json)
       {'title' => json['name'], 'url' => json['html_url']}
     end
 
     def repo_query(options = {})
-      json = HTTParty.get("https://api.github.com/repos/#{options[:user]}/#{options[:repo]}").body
+      agent = Mechanize.new
+      json = agent.get("https://api.github.com/repos/#{options[:user]}/#{options[:repo]}").body
       json = JSON.load(json)
       {'title' => "#{json['owner']['login']}/#{json['name']}", 'url' => json['html_url']}
     end
 
     def commit_query(options = {})
       url = "https://github.com/#{options[:user]}/#{options[:repo]}/commit/#{options[:commit]}"
-      json = HTTParty.get("#{url}.json").body
+      agent = Mechanize.new
+      json = agent.get("#{url}.json").body
       json = JSON.load(json)
       {'title' => "(#{json['commit']['author']['name']}) #{json['commit']['message']}", 'url' => url}
     end
 
     def issue_query(options = {})
-      json = HTTParty.get("https://api.github.com/repos/#{options[:user]}/#{options[:repo]}/issues/#{options[:issue]}").body
+      agent = Mechanize.new
+      json = agent.get("https://api.github.com/repos/#{options[:user]}/#{options[:repo]}/issues/#{options[:issue]}").body
       json = JSON.load(json)
       {'title' => "##{json['number']} - #{json['title']}", 'url' => json['html_url']}
     end

@@ -5,7 +5,6 @@ gem 'cinch'
 gem 'nokogiri'
 gem 'htmlentities'
 gem 'mechanize'
-gem 'httparty'
 gem 'liquid'
 
 group :datamapper do # used for Quotes plugin
