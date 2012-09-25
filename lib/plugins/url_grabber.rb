@@ -13,9 +13,12 @@ require "formatters/twitter"
 class UrlGrabber
   include Cinch::Plugin
 
-  prefix ''
+  set(
+    prefix: '',
+    react_on: :channel
+  )
+
   match /https?/, :method => :execute
-  react_on :channel
 
   def execute(m)
     # don't reply to urls posted by self

@@ -26,9 +26,11 @@ class Github
     github_regex: /\bgh:([a-z][\-\da-z]+)?(\/[a-z][\-\da-z]+)?(#\d+|@[\da-z]+)?\b/i
   }
 
-  prefix ''
+  set(
+    prefix: '',
+    react_on: :channel
+  )
   match DEFAULTS[:github_regex], method: :execute
-  react_on :channel
 
   def execute(m, user, repo, issue_or_commit)
     query_options = self.class.prepare_query(m, user: user, repo: repo, issue_or_commit: issue_or_commit)

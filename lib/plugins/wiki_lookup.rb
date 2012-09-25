@@ -4,7 +4,7 @@ require 'mechanize'
 class WikiLookup
   include Cinch::Plugin
 
-  prefix ''
+  set(prefix: '')
   match /\[\[(.*)\]\]/, :react_on => :channel
 
   def execute(m, term)
