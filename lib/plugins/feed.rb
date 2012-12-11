@@ -8,14 +8,15 @@ class Feed
   include Cinch::Plugin
 
   timer ::Hink.config[:feed][:interval].to_i*60, method: :check_news
+  @last_update = []
 
   def check_news
     Hink.bot.logger.debug("checking news")
     uris = Hink.config[:feed][:uris]
     news = []
 
-    uris.each do |uri|
-      news << self.class.check_news(uri)
+    uris.each_with_index do |uri, index|
+      news << self.class.check_news(uri, index)
     end
 
     news.flatten.each do |item|
@@ -25,14 +26,16 @@ class Feed
     end
   end
 
-  def self.check_news(uri)
+  def self.check_news(uri, index)
     agent = Mechanize.new
     feed = agent.get(uri).body
     rss = RSS::Parser.parse(feed)
-    threshold = (Time.now - 60*Hink.config[:feed][:interval].to_i).utc
-    items = rss.items.select do |i| 
-      i.date >= threshold
+    @last_update[index] = Time.now.utc if @last_update[index].nil?
+    
+    items = rss.items.select do |i|
+      i.date.utc > @last_update[index]
     end
+    @last_update[index] = rss.items.first.date.utc
     
     output = items.collect do |item|
       item = Formatters::Feed.new(item.to_s, Hink.config[:feed][:template])
