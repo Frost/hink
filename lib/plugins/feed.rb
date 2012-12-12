@@ -11,11 +11,11 @@ class Feed
   @last_update = {}
 
   def check_news
-#    Hink.bot.logger.debug("checking news")
+    Hink.bot.logger.debug("checking news")
     uris = Hink.config[:feed][:uris]
     news = []
 
-    uris.each_with_index do |uri|
+    uris.each do |uri|
       news << self.class.check_news(uri)
     end
 
