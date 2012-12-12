@@ -27,10 +27,8 @@ describe Feed do
   }
 
   let(:item_output) { "[News] News post | http://news.example.com/posts/4711" }
-
-  subject do
-    Feed.new
-  end
+  
+  subject { Feed.new }
 
   before(:all) do
     Formatters::Feed.stub(:parse_response!)
@@ -48,24 +46,26 @@ describe Feed do
           }
         }
       )
+      Feed.instance_variable_set(:@last_update, {})
     end
+
 
     context "a new post exists" do
       before(:each) do
-        date = Time.now - 3600
+        date = Time.now + 3600 
         feed = Liquid::Template.parse(feed_template).render('date' => date.strftime("%a, %d %b %Y %H:%M:%S UTC"))
-        stub_request(:get, "http://news.example.com").to_return(
+        stub_request(:get, feed_url).to_return(
           status: 200,
           body: feed
         )
       end
-
-      xit "tries to parse that post" do
+      
+      it "tries to parse that post" do
         Formatters::Feed.any_instance.should_receive(:'parse_response!')
         Feed.check_news(feed_url)
       end
 
-      xit "renders correct output" do
+      it "renders correct output" do
         Formatters::Feed.any_instance.should_receive(:'parse_response!')
         Formatters::Feed.any_instance.should_receive(:to_s).and_return(item_output)
         Feed.check_news(feed_url).should == [item_output]
@@ -75,7 +75,7 @@ describe Feed do
 
     context "no new posts" do
       before(:each) do
-        date = Time.now - 10*60 - 3600
+        date = Time.now - 3600
         feed = Liquid::Template.parse(feed_template).render('date' => date.strftime("%a, %d %b %Y %H:%M:%S GMT+1"))
         stub_request(:get, "http://news.example.com").to_return(
           status: 200,
@@ -83,7 +83,7 @@ describe Feed do
         )
       end
 
-      xit "returns nothing" do
+      it "returns nothing" do
         Feed.check_news(feed_url).should == []
       end
     end
