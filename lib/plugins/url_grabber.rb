@@ -29,10 +29,10 @@ class UrlGrabber
     # remove all non-printable characters
     message = m.message.scan(/[[:print:]]/).join
 
-    bot.logger.debug("received url(s): #{message}")
+    bot.loggers.debug("received url(s): #{message}")
     file_output = {}
     extract_urls(message).each do |url|
-      title = self.class.extract_title(bot.logger,url)
+      title = self.class.extract_title(bot.loggers,url)
 
       if title
         short_url = bitlyfy(url)
@@ -71,7 +71,7 @@ class UrlGrabber
       :format => "json",
       :longUrl => url).body)
 
-    bot.logger.debug(response_json)
+    bot.loggers.debug(response_json)
     
     case response_json["status_code"]
     when 200
@@ -85,7 +85,7 @@ class UrlGrabber
   end
 
   def write_output_to_file(file, urls = {}, channel = '?')
-    bot.logger.debug("writing to #{file}")
+    bot.loggers.debug("writing to #{file}")
 	html = HTMLEntities.new
     File.open(file, 'a') do |f|
 	  if f.size == 0
