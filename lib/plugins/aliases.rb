@@ -28,7 +28,7 @@ class Aliases
   match /alias (\w+) (.*)/i, method: :add_alias
   match /^~(\w+)/i, method: :search_alias, use_prefix: false
 
-  react_on :channel
+  set react_on: :channel
 
   def search_alias(m, trigger)
     a = Alias.get(trigger.downcase)
