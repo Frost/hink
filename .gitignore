@@ -19,3 +19,4 @@ Session.vim
 quotes.db
 *.db
 *.sqlite3
+.bundle/
