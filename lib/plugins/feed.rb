@@ -11,7 +11,7 @@ class Feed
   @last_update = {}
 
   def check_news
-    Hink.bot.logger.debug("checking news")
+    Hink.bot.loggers.debug("checking news")
     uris = Hink.config[:feed][:uris]
     news = []
 
