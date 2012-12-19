@@ -65,13 +65,12 @@ class UrlGrabber
   def bitlyfy(url)
     return nil unless Hink.config[:bitly]
     agent = Mechanize.new
-    response_json = JSON.parse(agent.get("http://api.bitly.com/v3/shorten",
+    response = agent.get("http://api.bitly.com/v3/shorten",
       :login => Hink.config[:bitly][:login],
       :apiKey => Hink.config[:bitly][:api_key],
       :format => "json",
-      :longUrl => url).body)
-
-    bot.loggers.debug(response_json)
+      :longUrl => url).body
+    response_json = JSON.parse(response)
     
     case response_json["status_code"]
     when 200
