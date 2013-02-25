@@ -20,6 +20,11 @@ module Formatters
       end
     end
 
+    def extract_hash_info!
+      @user = @uri[:user][:screen_name]
+      @tweet_text = @uri[:text]
+    end
+
     def perform_request!
       agent = Mechanize.new
       response = agent.get("http://api.twitter.com/1/statuses/show/#{@tweet_id}.json")

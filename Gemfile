@@ -6,6 +6,7 @@ gem 'nokogiri'
 gem 'htmlentities'
 gem 'mechanize'
 gem 'liquid'
+gem 'twitter'
 
 group :datamapper do # used for Quotes plugin
   gem 'dm-core'
