@@ -27,6 +27,15 @@
     :"#channel":
       :repo: "url-grabber"
       :account: "user"
+:twitter:
+  :consumer_key: "your_consumer_key_here"
+  :consumer_secret: "your_consumer_secret_here"
+  :oauth_token: "your_oauth_token_here"
+  :oauth_token_secret: "your_oauth_token_secret_here"
+  :interval: 1
+  :template: "[{{ type }}] @{{ user }}: {{ tweet }}"
+  :accounts:
+    - TestAccount
 :feed:
   :uris: 
   - http://news.example.com

@@ -20,7 +20,7 @@ class Feed
     end
 
     news.flatten.each do |item|
-      Hink.bot.channels.map do |c|
+      Hink.bot.channels.uniq.map do |c|
         c.send(item)
       end
     end
