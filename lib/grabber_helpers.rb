@@ -16,11 +16,11 @@ module GrabberHelpers
   end
 
   def genitive(nick)
-	 if nick[-1] == "s"
-	 	"#{nick}'"
-	 else
-	 	"#{nick}'s"
-	 end
+    if nick[-1] == "s"
+      "#{nick}'"
+    else
+      "#{nick}'s"
+    end
   end
 end
 
