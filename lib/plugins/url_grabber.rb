@@ -13,37 +13,31 @@ require "formatters/twitter"
 class UrlGrabber
   include Cinch::Plugin
 
-  set(
-    prefix: '',
-    react_on: :channel
-  )
-
-  match /https?/, :method => :execute
+  set(prefix: '', react_on: :channel)
+  match(/https?/, :method => :execute)
 
   def execute(m)
     # don't reply to urls posted by self
-    if m.user.nick == Hink.config[:cinch][:nick]
-      return 
-    end
+    return if m.user.nick == Hink.config[:cinch][:nick]
 
     # remove all non-printable characters
     message = m.message.scan(/[[:print:]]/).join
 
     bot.loggers.debug("received url(s): #{message}")
-    file_output = {}
+
     extract_urls(message).each do |url|
       title = self.class.extract_title(bot.loggers,url)
 
       if title
-        short_url = bitlyfy(url)
-        file_output[{:url => url, :bitly => short_url}] = title
-        output = Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
-        m.reply(output.render('url' => short_url, 'nick' => m.user.nick, 'content' => title))
+        output = render({url: bitlyfy(url), nick: m.user.nick, content: title})
+        m.reply(output)
       end
-
     end
-    output_file = Hink.config[:url_grabber][:url_dir] + "/" + m.channel.name.gsub(/^#/,'') + ".html"
-    write_output_to_file(output_file, file_output, m.channel.name)
+  end
+
+  def render(locals)
+    template = Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
+    template.render(locals)
   end
 
   def extract_urls(message)
@@ -82,30 +76,4 @@ class UrlGrabber
     puts e.class, e.message
     return :error
   end
-
-  def write_output_to_file(file, urls = {}, channel = '?')
-    bot.loggers.debug("writing to #{file}")
-	html = HTMLEntities.new
-    File.open(file, 'a') do |f|
-	  if f.size == 0
-	    f << %{
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8"/>
-    <title>#{channel} - Länksamling</title>
-    <style>
-      a:hover {color: red;}
-    </style>
-  </head>
-<body>
-  <pre>
-}
-	  end
-      urls.each do |url, title|
-        f.write(%(#{Time.now}: <a href="#{url[:url]}">#{html.encode title}</a>#{url[:bitly].nil? ? '' : %{<a href="#{url[:bitly]}">#{url[:bitly]}</a>}}\n))
-      end
-    end
-  end
-
 end
