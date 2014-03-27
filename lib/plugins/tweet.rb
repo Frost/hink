@@ -1,4 +1,4 @@
-require "config"
+require "cinch"
 require "twitter"
 require "formatters/twitter"
 
