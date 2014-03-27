@@ -1,5 +1,6 @@
 class Hink
-  @@config = YAML.load(File.read(File.dirname(__FILE__)+'/../config.yml'))
+  config_file = File.join(File.dirname(__FILE__), "..", "config.yml")
+  @@config = YAML.load(File.read(config_file))
 
   def self.setup(bot)
     @@bot = bot
@@ -14,7 +15,8 @@ class Hink
   end
 
   def self.setup_database
-    DataMapper.setup(:default, "sqlite://#{File.dirname(__FILE__)}/../hink.sqlite3")
+    db_file = File.join(File.dirname(__FILE__), "..", "hink.sqlite3")
+    DataMapper.setup(:default, "sqlite://#{db_file}")
   end
 end
 
