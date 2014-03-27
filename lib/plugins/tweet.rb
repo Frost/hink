@@ -12,7 +12,7 @@ class Tweet
 
     Twitter.configure do |config|
       config.consumer_key = Hink.config[:twitter][:consumer_key]
-      config.consumer_secret = Hink.config[:twitter][:consumer_secret] 
+      config.consumer_secret = Hink.config[:twitter][:consumer_secret]
       config.oauth_token = Hink.config[:twitter][:oauth_token]
       config.oauth_token_secret = Hink.config[:twitter][:oauth_token_secret]
     end
@@ -22,7 +22,7 @@ class Tweet
     Hink.bot.loggers.debug("checking tweets")
     accounts = Hink.config[:twitter][:accounts]
     news = []
-    
+
     accounts.each do |account|
       news << self.class.check_tweets(account)
     end
@@ -35,19 +35,24 @@ class Tweet
   end
 
   def self.check_tweets(account)
-    if @last_update[account].nil?
-      tweets = Twitter.user_timeline(account)
-    else
-      tweets = Twitter.user_timeline(account, :since_id => @last_update[account])
-
-      output = tweets.collect do |item|
-        item = Formatters::Twitter.new(item, Hink.config[:twitter][:template])
-        item.extract_hash_info!
-        item.to_s
-      end
+    tweets = Twitter.user_timeline(account, timeline_options(account))
+    output = tweets.compact.collect do |item|
+      item = render_tweet(item)
     end
- 
+
     @last_update[account] = tweets.first[:id] unless tweets.first.nil?
     [*output].reverse.compact
+  end
+
+  private
+
+  def self.timeline_options(account)
+    { since_id: @last_update[account] }.select {|k,v| !v.nil? }
+  end
+
+  def self.render_tweet(tweet)
+    tweet = Formatters::Twitter.new(tweet, Hink.config[:twitter][:template])
+    tweet.extract_hash_info!
+    tweet.to_s
   end
 end

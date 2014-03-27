@@ -23,7 +23,7 @@ describe Tweet do
         }
       )
       Twitter.stub(:user_timeline) do |account, arg|
-        if arg
+        if arg && arg[:since_id]
           if arg[:since_id] <= tweet.first[:id]
             tweet
           else
