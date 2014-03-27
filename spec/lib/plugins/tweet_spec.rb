@@ -48,12 +48,12 @@ describe Tweet do
       before(:each) do
         Tweet.instance_variable_set(:@last_update, {account_name => 99})
       end
-      
+
       it "tries to parse the tweet" do
         Formatters::Twitter.any_instance.should_receive(:extract_hash_info!)
         Tweet.check_tweets(account_name)
       end
-      
+
       it "renders correct output" do
         Formatters::Twitter.any_instance.should_receive(:extract_hash_info!)
         Formatters::Twitter.any_instance.should_receive(:to_s).and_return(parsed_tweet)
