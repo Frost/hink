@@ -18,7 +18,7 @@ describe Helpers::UriExtractor do
       uri = Helpers::Uri.new("http://validtopdomain.com/existing")
       uri.valid?.should == true
     end
-    
+
     it "returns true for a valid url with some crap at the end" do
       stub_request(:head, "http://validtopdomain.com/existing/)").to_return(
         status: 200,
@@ -37,7 +37,7 @@ describe Helpers::UriExtractor do
       uri = Helpers::Uri.new("http://validtopdomain.com/nonexisting")
       uri.valid?.should == false
     end
-    
+
     it "returns false for a non-existing site" do
       stub_request(:head, "http://invalidtopdomain.com").to_raise(SocketError)
 
@@ -83,7 +83,6 @@ describe Helpers::UriExtractor do
 
       uri = Helpers::Uri.new("https://twitter.com/#!/eslinge/status/125580490223783937")
       uri.render!.should == twitter_output
-
     end
   end
 end
