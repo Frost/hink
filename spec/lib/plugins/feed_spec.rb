@@ -5,6 +5,7 @@ require "formatters/feed"
 require 'plugins/feed'
 
 describe Feed do
+  let(:bot) { Cinch::Bot.new }
   let(:feed_url) { "http://news.example.com" }
   let(:feed_template) {
     %(
@@ -27,64 +28,65 @@ describe Feed do
   }
 
   let(:item_output) { "[News] News post | http://news.example.com/posts/4711" }
-  
-  subject { Feed.new }
+
+  subject { Feed.new(bot) }
 
   before(:all) do
-    Formatters::Feed.stub(:parse_response!)
+    bot.loggers.level = :fatal
+    Hink.setup(bot)
     Formatters::Feed.stub(:to_s)
   end
-  
+
   describe "interval" do
     before(:each) do
       Hink.stub(:config).and_return(
         {
           feed: {
-            uri: "http://news.example.com",
+            uris: %w[ http://news.example.com ],
             interval: 5,
             template: "[{{ type }}] {{ title }} | {{ link }}"
           }
         }
       )
-      Feed.instance_variable_set(:@last_update, {})
+      Feed.class_variable_set(:@@last_update, {})
     end
 
 
     context "a new post exists" do
       before(:each) do
-        date = Time.now + 3600 
-        feed = Liquid::Template.parse(feed_template).render('date' => date.strftime("%a, %d %b %Y %H:%M:%S UTC"))
+        date = Time.now + 3600
+        feed = Liquid::Template.parse(feed_template).render(
+          'date' => date.strftime("%a, %d %b %Y %H:%M:%S UTC"))
         stub_request(:get, feed_url).to_return(
           status: 200,
           body: feed
         )
       end
-      
+
       it "tries to parse that post" do
-        Formatters::Feed.any_instance.should_receive(:'parse_response!')
-        Feed.check_news(feed_url)
+        Formatters::Feed.any_instance.should_receive(:render)
+        subject.check_news
       end
 
       it "renders correct output" do
-        Formatters::Feed.any_instance.should_receive(:'parse_response!')
-        Formatters::Feed.any_instance.should_receive(:to_s).and_return(item_output)
-        Feed.check_news(feed_url).should == [item_output]
+        Formatters::Feed.any_instance.should_receive(:render).and_return(item_output)
+        subject.check_news.should == [item_output]
       end
 
     end
 
     context "no new posts" do
       before(:each) do
-        date = Time.now - 3600
+        date = Time.now.utc - 3600
         feed = Liquid::Template.parse(feed_template).render('date' => date.strftime("%a, %d %b %Y %H:%M:%S GMT+1"))
-        stub_request(:get, "http://news.example.com").to_return(
+        stub_request(:get, feed_url).to_return(
           status: 200,
           body: feed
         )
       end
 
       it "returns nothing" do
-        Feed.check_news(feed_url).should == []
+        subject.check_news.should == []
       end
     end
   end
