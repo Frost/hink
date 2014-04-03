@@ -19,7 +19,7 @@ describe Formatters::Feed do
         <pubDate>{{date}}</pubDate>
         <guid>#{post_url}</guid>
       </item>
-    ) 
+    )
   }
 
   subject { Formatters::Feed.new(item, template) }
@@ -29,24 +29,14 @@ describe Formatters::Feed do
       feed = Formatters::Feed.new(item, template)
       feed.item.should == item
     end
-  end
 
-  context "parse" do
     it "extracts the title from the item" do
       formatter = subject
-      formatter.parse_response!
       formatter.title.should == post_title
     end
 
-    it "extracts the author from the item" do
-      formatter = subject
-      formatter.parse_response!
-      formatter.author.should == author
-    end
-    
     it "extracts the url from the item" do
       formatter = subject
-      formatter.parse_response!
       formatter.link.should == post_url
     end
   end
@@ -54,7 +44,6 @@ describe Formatters::Feed do
   context "to_s" do
     it "properly formats the string" do
       formatter = subject
-      formatter.parse_response!
       formatter.to_s.should == output_format
     end
   end
