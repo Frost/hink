@@ -9,14 +9,19 @@ describe Tweet do
   }
   let(:account_name) { "the_tester" }
   let(:parsed_tweet) { "[Twitter] @the_tester: Test tweet! #YOLO"  }
-  subject { Tweet.new }
+  let(:bot) { Cinch::Bot.new }
+  subject { Tweet.new(bot) }
+
+  before(:all) {
+    bot.loggers.level = :fatal
+  }
 
   describe "interval" do
     before(:each) do
       Hink.stub(:config).and_return(
         {
           twitter: {
-            account: "Tester",
+            accounts: [ account_name ],
             interval: 1,
             template: "[{{ type }}] @{{ user }}: {{ tweet }}"
           }
@@ -33,13 +38,13 @@ describe Tweet do
           tweet
         end
       end
-      Tweet.instance_variable_set(:@last_update, {})
+      Tweet.class_variable_set(:@@last_update, {})
     end
 
     context "first run" do
       it "gets the last read id updated" do
-        Tweet.check_tweets(account_name)
-        last_update = Tweet.instance_variable_get(:@last_update)
+        subject.check_tweets
+        last_update = subject.class.class_variable_get(:@@last_update)
         last_update[account_name].should == tweet.first[:id]
       end
     end
@@ -51,21 +56,21 @@ describe Tweet do
 
       it "tries to parse the tweet" do
         Formatters::Twitter.any_instance.should_receive(:extract_hash_info!)
-        Tweet.check_tweets(account_name)
+        subject.check_tweets
       end
 
       it "renders correct output" do
         Formatters::Twitter.any_instance.should_receive(:extract_hash_info!)
         Formatters::Twitter.any_instance.should_receive(:to_s).and_return(parsed_tweet)
-        Tweet.check_tweets(account_name).should == [parsed_tweet]
+        subject.check_tweets.should == [parsed_tweet]
       end
 
     end
 
     context "no new tweets" do
       it "returns nothing" do
-        Tweet.instance_variable_set(:@last_update, {account_name => 1001})
-        Tweet.check_tweets(account_name).should == []
+        Tweet.class_variable_set(:@@last_update, {account_name => 1001})
+        subject.check_tweets.should == []
       end
     end
   end

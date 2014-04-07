@@ -6,7 +6,7 @@ class Tweet
   include Cinch::Plugin
   timer ::Hink.config[:twitter][:interval].to_i*60, method: :check_tweets
 
-  @last_update = {}
+  @@last_update = {}
   def initialize(*args)
     super
 
@@ -19,38 +19,40 @@ class Tweet
   end
 
   def check_tweets
-    Hink.bot.loggers.debug("checking tweets")
+    bot.loggers.debug("checking tweets")
     accounts = Hink.config[:twitter][:accounts]
-    news = []
+    tweets = []
 
     accounts.each do |account|
-      news << self.class.check_tweets(account)
+      tweets << check(account)
     end
 
-    news.flatten.each do |item|
-      Hink.bot.channels.uniq.map do |c|
+    tweets.flatten.each do |item|
+      bot.channels.uniq.map do |c|
         c.send(item)
       end
     end
+
+    return tweets.flatten
   end
 
-  def self.check_tweets(account)
+  def check(account)
     tweets = Twitter.user_timeline(account, timeline_options(account))
     output = tweets.compact.collect do |item|
       item = render_tweet(item)
     end
 
-    @last_update[account] = tweets.first[:id] unless tweets.first.nil?
-    [*output].reverse.compact
+    @@last_update[account] = tweets.first[:id] unless tweets.first.nil?
+    return output.compact.reverse
   end
 
   private
 
-  def self.timeline_options(account)
-    { since_id: @last_update[account] }.select {|k,v| !v.nil? }
+  def timeline_options(account)
+    { since_id: @@last_update[account] }.select {|k,v| !v.nil? }
   end
 
-  def self.render_tweet(tweet)
+  def render_tweet(tweet)
     tweet = Formatters::Twitter.new(tweet, Hink.config[:twitter][:template])
     tweet.extract_hash_info!
     tweet.to_s
