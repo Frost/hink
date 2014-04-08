@@ -21,32 +21,27 @@ class Tweet
   def check_tweets
     bot.loggers.debug("checking tweets")
     accounts = Hink.config[:twitter][:accounts]
-    tweets = []
-
-    accounts.each do |account|
-      tweets << check(account)
-    end
-
-    tweets.flatten.each do |item|
-      bot.channels.uniq.map do |c|
-        c.send(item)
-      end
-    end
-
-    return tweets.flatten
+    write_to_channels(accounts.collect {|account| check(account) }.flatten)
   end
 
-  def check(account)
-    tweets = Twitter.user_timeline(account, timeline_options(account))
-    output = tweets.compact.collect do |item|
-      item = render_tweet(item)
-    end
+ private
 
-    @@last_update[account] = tweets.first[:id] unless tweets.first.nil?
+  def check(account)
+    output = tweets(account).collect { |item| render_tweet(item) }
     return output.compact.reverse
   end
 
-  private
+  def write_to_channels(tweets)
+    tweets.each do |item|
+      bot.channels.uniq.map {|c| c.send(item) }
+    end
+  end
+
+  def tweets(account)
+    tweets = Twitter.user_timeline(account, timeline_options(account)).compact
+    @@last_update[account] = tweets.first[:id] unless tweets.first.nil?
+    return tweets
+  end
 
   def timeline_options(account)
     { since_id: @@last_update[account] }.select {|k,v| !v.nil? }
