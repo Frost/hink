@@ -2,6 +2,7 @@ language: ruby
 bundle_args: --without development
 before_script: cp ./config.yml.test ./config.yml
 rvm:
-  - 1.9.2
   - 1.9.3
+  - 2.0.0
+  - 2.1.0
 
