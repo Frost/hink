@@ -25,7 +25,6 @@ class Feed
     extract_items(uri).collect {|item| render(item) }.compact
   end
 
-
   def extract_items(uri)
     items = parse_feed(uri).items.select {|i| i.date.utc > @@last_update[uri] }
     @@last_update[uri] = items.first.date.utc if items.any?
