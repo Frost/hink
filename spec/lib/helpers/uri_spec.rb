@@ -5,7 +5,10 @@ include WebMock::API
 
 describe Helpers::UriExtractor do
   describe "initialize" do
-    it "sets the uri attribute"
+    it "sets the uri attribute" do
+      uri = Helpers::Uri.new("http://ceri.se")
+      uri.uri.should_not be_nil
+    end
   end
 
   describe "valid?" do
