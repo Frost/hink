@@ -1,6 +1,8 @@
 language: ruby
 bundle_args: --without development
 before_script: cp ./config.yml.test ./config.yml
+env:
+- CODECLIMATE_REPO_TOKEN=d0724ba02633fdb7e90f756476a3c882c1af8a844a02024261865ecbdeb64a6d
 rvm:
   - 1.9.3
   - 2.0.0

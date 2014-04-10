@@ -29,3 +29,5 @@ group :development,:test do
   gem 'rb-fchange', require: false
   gem 'webmock'
 end
+
+gem "codeclimate-test-reporter", group: :test, require: nil
