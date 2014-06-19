@@ -1,3 +1,5 @@
+require 'htmlentities'
+
 module GrabberHelpers
   def constantize(name)
     c = Object
@@ -6,7 +8,7 @@ module GrabberHelpers
 
   def underscore(name)
     name = name.gsub(' ','_')
-    if name  =~ /[A-Z]/
+    if name =~ /[A-Z]/
       words = []
       name.scan(/([A-Z][a-z]+)/) {|match| words << match[0].downcase}
       return words.join('_')
@@ -15,12 +17,8 @@ module GrabberHelpers
     end
   end
 
-  def genitive(nick)
-    if nick[-1] == "s"
-      "#{nick}'"
-    else
-      "#{nick}'s"
-    end
+  def sanitize_title(title)
+    HTMLEntities.new.decode(title).gsub(/\s+/, ' ').strip
   end
 end
 

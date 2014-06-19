@@ -1,35 +1,49 @@
 require 'spec_helper'
 require 'grabber_helpers'
 
+class HelpersTestClass
+  include GrabberHelpers
+end
+
 describe GrabberHelpers do
-  before(:all) do
-    class Foo
-      include GrabberHelpers
-    end
-    @subject = Foo.new
-  end
+  let(:subject) { HelpersTestClass.new }
+
   describe "constantize" do
     it "transforms the given string to a constant" do
-      @subject.constantize("Object").should == Object
+      subject.constantize("Object").should == Object
     end
   end
 
   describe "underscore" do
     it "replaces spaces with underscores" do
-      @subject.underscore("foo bar baz").should == "foo_bar_baz"
+      subject.underscore("foo bar baz").should == "foo_bar_baz"
     end
 
     it "transforms FooBar to foo_bar" do
-      @subject.underscore("FooBar").should == "foo_bar"
+      subject.underscore("FooBar").should == "foo_bar"
     end
   end
 
-  describe "genitive" do
-    it "appends 's to words not ending with an s" do
-      @subject.genitive("Martin").should == "Martin's"
-    end
-    it "appends ' to words ending with an s" do
-      @subject.genitive("Hans").should == "Hans'"
+  describe "sanitize_title" do
+    describe "sanitize_title" do
+      it "should not mess with sane titles" do
+        subject.sanitize_title("").should == ""
+        subject.sanitize_title("ab").should == "ab"
+      end
+
+      it "should handle linebreaks" do
+        subject.sanitize_title("a\nb").should == "a b"
+        subject.sanitize_title(" a\nb ").should == "a b"
+        subject.sanitize_title(" a\n\n\nb ").should == "a b"
+        subject.sanitize_title("\nab\n").should == "ab"
+        subject.sanitize_title("\n\n\nab\n\n\n").should == "ab"
+      end
+
+      it "should handle whitespace" do
+        subject.sanitize_title("a b").should == "a b"
+        subject.sanitize_title(" a b ").should == "a b"
+        subject.sanitize_title("   a   b   ").should == "a b"
+      end
     end
   end
 end
