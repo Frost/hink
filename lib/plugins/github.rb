@@ -66,7 +66,7 @@ class Github
     def query_type(options)
       if options[:user]
         return :user unless options[:repo]
-        options[:repo].gstub!(/^\//, '')
+        options[:repo].gsub!(/^\//, '')
 
         case options[:issue_or_commit]
         when /^#/ then :issue
