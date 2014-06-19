@@ -42,37 +42,44 @@ class Github
 
   class << self
     ##
-    # Take a bunch of input (user, repo, issue, commit) 
+    # Take a bunch of input (user, repo, issue, commit)
     # and calculate what api to perform the query against.
     # Outputs query_type: :none if the options aren't suitable.
     def prepare_query(m, options = {})
       channel_defaults = Hink.config[:github][:channels][m.channel.name.to_sym] || {}
       options = channel_defaults.merge(options)
 
-      query_type = if options[:user]
-        if options[:repo]
-          options[:repo].gsub!(/^\//, '')
-          case options[:issue_or_commit]
-          when /^#/
-            options[:issue] = options[:issue_or_commit].gsub(/^#/, '')
-            :issue
-          when /^@/
-            options[:commit] = options[:issue_or_commit].gsub(/^@/, '')
-            :commit
-          else :repo
-          end
-        else
-          :user
+      return restructure_options_by_query_type(options)
+    end
+
+    def restructure_options_by_query_type(options)
+      options[:query_type] = query_type(options)
+      case options[:query_type]
+      when :issue
+        options[:issue] = options[:issue_or_commit].gsub(/^#/, '')
+      when :commit
+        options[:commit] = options[:issue_or_commit].gsub(/^@/, '')
+      end
+      return options
+    end
+
+    def query_type(options)
+      if options[:user]
+        return :user unless options[:repo]
+        options[:repo].gstub!(/^\//, '')
+
+        case options[:issue_or_commit]
+        when /^#/ then :issue
+        when /^@/ then :commit
+        else :repo
         end
       else
-        :none
+        return :none
       end
-      
-      options.merge(query_type: query_type)
     end
 
     def perform_query(options)
-      query_type = options.delete(:query_type)      
+      query_type = options.delete(:query_type)
       self.send("#{query_type}_query", options)
     end
 
