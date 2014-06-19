@@ -1,3 +1,5 @@
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
 $: << File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib')
 
 require 'webmock/rspec'
