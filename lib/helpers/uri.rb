@@ -1,5 +1,8 @@
 require "config"
 require "grabber_helpers"
+require "mechanize"
+require "formatters/twitter"
+require "formatters/url"
 
 module Helpers
   class Uri
