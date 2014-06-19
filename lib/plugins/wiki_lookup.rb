@@ -14,31 +14,19 @@ class WikiLookup
   )
   match LINK_REGEX
 
-  def execute(m, term)
-    result = extract_urls(m)
-    result.map do |match, title|
+  def execute(m)
+    extract_urls(m).map do |match, title|
       m.reply("[[#{match}]]: #{title}")
     end
   end
 
   def extract_urls(message)
-    matches = message.message.scan(LINK_REGEX)
-
-    result = {}
-
-    matches.flatten.map do |match|
-      if url = extract_url(match)
-        result[match] = url
-      end
+    matches = message.message.scan(LINK_REGEX).flatten
+    matches.each_with_object({}) do |match, result|
+      url = url(match)
+      page = fetch_page(url)
+      result[match] = url if page && title(page) !~ /^Search results for .*/
     end
-
-    return result
-  end
-
-  def extract_url(match)
-    url = url(match)
-    page = fetch_page(url)
-    return url if page && title(page) !~ /^Search results for .*/
   end
 
   def fetch_page(url)
