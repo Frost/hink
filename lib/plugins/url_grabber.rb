@@ -3,12 +3,10 @@ require 'cinch'
 require 'json'
 require 'open-uri'
 require 'nokogiri'
-require 'htmlentities'
 require 'mechanize'
 require 'liquid'
 require 'helpers/uri'
-require "formatters/url"
-require "formatters/twitter"
+require "grabber_helpers"
 
 class UrlGrabber
   include Cinch::Plugin
@@ -23,32 +21,36 @@ class UrlGrabber
     # remove all non-printable characters
     message = m.message.scan(/[[:print:]]/).join
 
+    grab_urls(message).each { |response| m.reply(response, true) }
+  end
+
+  def grab_urls(m)
     bot.loggers.debug("received url(s): #{message}")
 
     extract_urls(message).each do |url|
-      title = self.class.extract_title(bot.loggers,url)
+      title = extract_title(bot.loggers,url)
 
       if title
-        output = render({url: bitlyfy(url), nick: m.user.nick, content: title})
-        m.reply(output)
+        template.render({
+          url: bitlyfy(url),
+          nick: m.user.nick,
+          content: title
+        })
       end
     end
   end
 
-  def render(locals)
-    template = Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
-    template.render(locals)
+ private
+
+  def template
+    Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
   end
 
   def extract_urls(message)
     return URI.extract(message, /https?/)
   end
 
-  def self.sanitize_title(title)
-    HTMLEntities.new.decode(title).gsub(/\s+/, ' ').strip
-  end
-
-  def self.extract_title(logger, url)
+  def extract_title(logger, url)
     logger.debug("extracting title for #{url}")
     uri = Helpers::Uri.new(url)
     if uri.valid?
@@ -58,18 +60,16 @@ class UrlGrabber
 
   def bitlyfy(url)
     return nil unless Hink.config[:bitly]
-    agent = Mechanize.new
-    response = agent.get("http://api.bitly.com/v3/shorten",
+    response = Mechanize.new.get("http://api.bitly.com/v3/shorten",
       :login => Hink.config[:bitly][:login],
       :apiKey => Hink.config[:bitly][:api_key],
       :format => "json",
       :longUrl => url).body
     response_json = JSON.parse(response)
-    
-    case response_json["status_code"]
-    when 200
+
+    if response_json["status_code"].to_i == 200
       return response_json["data"]["url"]
-    when 200
+    else
       return :error
     end
   rescue => e
