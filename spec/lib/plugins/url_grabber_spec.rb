@@ -74,22 +74,22 @@ describe UrlGrabber do
     it "does nothing on message that doesn't contain any URI" do
       message = "foo bar baz"
 
-      subject.grab_urls(message).should == []
+      expect(subject.grab_urls(message)).to eq([])
     end
 
     it "extracts urls from a message" do
       message = "http://example.com"
-      subject.grab_urls(message).should == [
+      expect(subject.grab_urls(message)).to eq([
         ["http://example.com","[Url] Page title"]
-      ]
+      ])
     end
 
     it "extracts multiple urls from a message" do
       message = "http://example.com http://example.com"
-      subject.grab_urls(message).should == [
+      expect(subject.grab_urls(message)).to eq([
         ["http://example.com","[Url] Page title"],
         ["http://example.com","[Url] Page title"]
-      ]
+      ])
     end
 
   end

@@ -27,24 +27,24 @@ describe Formatters::Feed do
   context "initialize" do
     it "sets the @item attribute" do
       feed = Formatters::Feed.new(item, template)
-      feed.item.should == item
+      expect(feed.item).to eq(item)
     end
 
     it "extracts the title from the item" do
       formatter = subject
-      formatter.title.should == post_title
+      expect(formatter.title).to eq(post_title)
     end
 
     it "extracts the url from the item" do
       formatter = subject
-      formatter.link.should == post_url
+      expect(formatter.link).to eq(post_url)
     end
   end
 
   context "to_s" do
     it "properly formats the string" do
       formatter = subject
-      formatter.to_s.should == output_format
+      expect(formatter.to_s).to eq(output_format)
     end
   end
 end

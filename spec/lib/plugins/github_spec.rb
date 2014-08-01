@@ -9,27 +9,27 @@ describe Github do
       end
 
       it "should match a user query" do
-        (subject =~ "gh:Frost").should_not be_nil
-        $1.should == "Frost"
+        expect(subject =~ "gh:Frost").to_not be_nil
+        expect($1).to eq("Frost")
       end
 
       it "should match a repo query" do
-        (subject =~ "gh:Frost/hink").should_not be_nil
-        $1.should == "Frost"
-        $2.should == "/hink"
+        expect(subject =~ "gh:Frost/hink").to_not be_nil
+        expect($1).to eq("Frost")
+        expect($2).to eq("/hink")
       end
 
       it "should match a issue query" do
-        (subject =~ "gh:Frost/hink#24").should_not be_nil
-        $1.should == "Frost"
-        $2.should == "/hink"
-        $3.should == "#24"
+        expect(subject =~ "gh:Frost/hink#24").to_not be_nil
+        expect($1).to eq("Frost")
+        expect($2).to eq("/hink")
+        expect($3).to eq("#24")
       end
       it "should match a commit query" do
-        (subject =~ "gh:Frost/hink@06921b39").should_not be_nil
-        $1.should == "Frost"
-        $2.should == "/hink"
-        $3.should == "@06921b39"
+        expect(subject =~ "gh:Frost/hink@06921b39").to_not be_nil
+        expect($1).to eq("Frost")
+        expect($2).to eq("/hink")
+        expect($3).to eq("@06921b39")
       end
     end
   end
@@ -41,7 +41,7 @@ describe Github do
 
     context "without proper channel conf" do
       before(:each) do
-        Hink.stub(:config).and_return({github: {channels: {}}})
+        allow(Hink).to receive_messages(config: {github: {channels: {}}})
       end
 
       describe "missing user" do
@@ -50,7 +50,7 @@ describe Github do
         end
 
         it "has query_type :none" do
-          subject[:query_type].should == :none
+          expect(subject[:query_type]).to eq(:none)
         end
       end
 
@@ -60,11 +60,11 @@ describe Github do
         end
 
         it "calculates proper query type" do
-          subject[:query_type].should == :user
+          expect(subject[:query_type]).to eq(:user)
         end
 
         it "calculates proper user name" do
-          subject[:user].should == "Frost"
+          expect(subject[:user]).to eq("Frost")
         end
 
       end
@@ -75,15 +75,15 @@ describe Github do
         end
 
         it "calculates proper query type" do
-          subject[:query_type].should == :repo
+          expect(subject[:query_type]).to eq(:repo)
         end
 
         it "calculates proper user name" do
-          subject[:user].should == "Frost"
+          expect(subject[:user]).to eq("Frost")
         end
 
         it "calculates proper repo name" do
-          subject[:repo].should == "hink"
+          expect(subject[:repo]).to eq("hink")
         end
       end
 
@@ -93,19 +93,19 @@ describe Github do
         end
 
         it "calculates proper query type" do
-          subject[:query_type].should == :commit
+          expect(subject[:query_type]).to eq(:commit)
         end
 
         it "calculates proper user name" do
-          subject[:user].should == "Frost"
+          expect(subject[:user]).to eq("Frost")
         end
 
         it "calculates proper repo name" do
-          subject[:repo].should == "hink"
+          expect(subject[:repo]).to eq("hink")
         end
 
         it "calculates proper commit sha hash" do
-          subject[:commit].should == "06921b39"
+          expect(subject[:commit]).to eq("06921b39")
         end
       end
 
@@ -114,7 +114,7 @@ describe Github do
     
     context "with proper channel conf" do
       before(:each) do
-        Hink.stub(:config).and_return({github: {channels: {"#test-hink".to_sym => {}}}})
+        allow(Hink).to receive_messages(config: {github: {channels: { :"#test-test" => {}}}})
       end
 
       describe "missing user" do
@@ -123,7 +123,7 @@ describe Github do
         end
 
         it "has query_type :none" do
-          subject[:query_type].should == :none
+          expect(subject[:query_type]).to eq(:none)
         end
       end
 
@@ -133,11 +133,11 @@ describe Github do
         end
 
         it "calculates proper query type" do
-          subject[:query_type].should == :user
+          expect(subject[:query_type]).to eq(:user)
         end
 
         it "calculates proper user name" do
-          subject[:user].should == "Frost"
+          expect(subject[:user]).to eq("Frost")
         end
 
       end
@@ -148,15 +148,15 @@ describe Github do
         end
 
         it "calculates proper query type" do
-          subject[:query_type].should == :repo
+          expect(subject[:query_type]).to eq(:repo)
         end
 
         it "calculates proper user name" do
-          subject[:user].should == "Frost"
+          expect(subject[:user]).to eq("Frost")
         end
 
         it "calculates proper repo name" do
-          subject[:repo].should == "hink"
+          expect(subject[:repo]).to eq("hink")
         end
       end
 
@@ -166,19 +166,19 @@ describe Github do
         end
 
         it "calculates proper query type" do
-          subject[:query_type].should == :commit
+          expect(subject[:query_type]).to eq(:commit)
         end
 
         it "calculates proper user name" do
-          subject[:user].should == "Frost"
+          expect(subject[:user]).to eq("Frost")
         end
 
         it "calculates proper repo name" do
-          subject[:repo].should == "hink"
+          expect(subject[:repo]).to eq("hink")
         end
 
         it "calculates proper commit sha hash" do
-          subject[:commit].should == "06921b39"
+          expect(subject[:commit]).to eq("06921b39")
         end
       end
     end
@@ -190,19 +190,19 @@ describe Github do
       end
 
       it "calculates proper query type" do
-        subject[:query_type].should == :issue
+        expect(subject[:query_type]).to eq(:issue)
       end
 
       it "calculates proper user name" do
-        subject[:user].should == "Frost"
+        expect(subject[:user]).to eq("Frost")
       end
 
       it "calculates proper repo name" do
-        subject[:repo].should == "hink"
+        expect(subject[:repo]).to eq("hink")
       end
 
       it "calculates proper issue number" do
-        subject[:issue].should == "24"
+        expect(subject[:issue]).to eq("24")
       end
     end
   end
@@ -222,8 +222,8 @@ describe Github do
         }.to_json
       )
       hash = Github.perform_query(query_type: :issue, user: "Frost", repo: "hink",issue: "24")
-      hash['url'].should == "https://github.com/Frost/hink/issues/24"
-      hash['title'].should == "#24 - Add custom output formats for sites to UrlGrabber plugin"
+      expect(hash['url']).to eq("https://github.com/Frost/hink/issues/24")
+      expect(hash['title']).to eq("#24 - Add custom output formats for sites to UrlGrabber plugin")
     end
 
     it "performs commit queries" do
@@ -237,8 +237,8 @@ describe Github do
         }.to_json
       )
       hash = Github.perform_query(query_type: :commit, user: "Frost", repo: "hink", commit: "06921b39")
-      hash['url'].should == "https://github.com/Frost/hink/commit/06921b39"
-      hash['title'].should == "(Martin Frost) moved rspec to development group in gemfile"
+      expect(hash['url']).to eq("https://github.com/Frost/hink/commit/06921b39")
+      expect(hash['title']).to eq("(Martin Frost) moved rspec to development group in gemfile")
     end
 
     it "performs repo queries" do
@@ -251,8 +251,8 @@ describe Github do
         }.to_json
       )
       hash = Github.perform_query(query_type: :repo, user: "Frost", repo: "hink")
-      hash['url'].should == "https://github.com/Frost/hink"
-      hash['title'].should == "Frost/hink"
+      expect(hash['url']).to eq("https://github.com/Frost/hink")
+      expect(hash['title']).to eq("Frost/hink")
     end
 
     it "performs user queries" do
@@ -264,8 +264,8 @@ describe Github do
         }.to_json
       )
       hash = Github.perform_query(query_type: :user, user: "Frost")
-      hash['url'].should == "https://github.com/Frost"
-      hash['title'].should == "Martin Frost"
+      expect(hash['url']).to eq("https://github.com/Frost")
+      expect(hash['title']).to eq("Martin Frost")
     end
   end
 

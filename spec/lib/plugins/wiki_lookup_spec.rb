@@ -3,7 +3,8 @@ require 'plugins/wiki_lookup'
 require 'ostruct'
 
 describe WikiLookup do
-  let(:bot) { Cinch::Bot.new }
+  bot = Cinch::Bot.new
+
   before(:all) do
     bot.loggers.level = :fatal
     Hink.setup(bot)
@@ -15,7 +16,7 @@ describe WikiLookup do
 
       matches = result.map(&:first)
 
-      matches.should == ["simple"]
+      expect(matches).to eq(["simple"])
     end
 
     it "catches links with multiple words" do
@@ -23,7 +24,7 @@ describe WikiLookup do
 
       matches = result.map(&:first)
 
-      matches.should == ["one two three"]
+      expect(matches).to eq(["one two three"])
     end
 
     it "catches a line with double links" do
@@ -31,7 +32,7 @@ describe WikiLookup do
 
       matches = result.map(&:first)
 
-      matches.should == ["one", "two"]
+      expect(matches).to eq(["one", "two"])
     end
   end
 
@@ -48,9 +49,9 @@ describe WikiLookup do
       message.message = "[[Foobar]]"
 
       result = subject.extract_urls(message)
-      result.should == {
+      expect(result).to eq({
         "Foobar" => "#{Hink.config[:wiki_lookup][:url]}foobar"
-      }
+      })
 
     end
 
@@ -67,10 +68,10 @@ describe WikiLookup do
       message.message = "[[Foo]] [[Bar]]"
 
       result = subject.extract_urls(message)
-      result.should == {
+      expect(result).to eq({
         "Foo" => "#{Hink.config[:wiki_lookup][:url]}foo",
         "Bar" => "#{Hink.config[:wiki_lookup][:url]}bar"
-      }
+      })
     end
 
     it "doesn't return anything for non-existing pages" do
@@ -81,7 +82,7 @@ describe WikiLookup do
 
       message.message = "[[Foo]]"
       result = subject.extract_urls(message)
-      result.should == {}
+      expect(result).to eq({})
     end
 
     it "returns nothing if a request fails" do
@@ -91,7 +92,7 @@ describe WikiLookup do
       )
       message.message = "[[Foo]]"
       result = subject.extract_urls(message)
-      result.should == {}
+      expect(result).to eq({})
     end
   end
 end

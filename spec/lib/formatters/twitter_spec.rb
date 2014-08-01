@@ -22,25 +22,25 @@ describe Formatters::Twitter do
 
     context "FORMAT" do
       it "should match twitter.com" do
-        Formatters::Twitter::FORMAT.should match(uri)
+        expect(Formatters::Twitter::FORMAT).to match(uri)
       end
 
       it "should match mobile.twitter.com" do
-        Formatters::Twitter::FORMAT.should match(mobile_uri)
+        expect(Formatters::Twitter::FORMAT).to match(mobile_uri)
       end
     end
 
     context "initialize" do
       it "sets the @uri attribute" do
-        subject.uri.should == uri
+        expect(subject.uri).to eq(uri)
       end
 
       it "extracts the status id" do
-        subject.tweet_id.should == tweet_id
+        expect(subject.tweet_id).to eq(tweet_id)
       end
 
       it "extracts the user name" do
-        subject.user.should == "eslinge"
+        expect(subject.user).to eq("eslinge") 
       end
     end
 
@@ -48,7 +48,7 @@ describe Formatters::Twitter do
       it "stores the response" do
         formatter = subject
         formatter.perform_request!
-        formatter.response.should == response
+        expect(formatter.response).to eq(response)
       end
 
     end
@@ -58,7 +58,7 @@ describe Formatters::Twitter do
         formatter = subject
         formatter.perform_request!
         formatter.parse_response!
-        formatter.tweet_text.should == tweet_text
+        expect(formatter.tweet_text).to eq(tweet_text)
       end
     end
 
@@ -67,7 +67,7 @@ describe Formatters::Twitter do
         formatter = subject
         formatter.perform_request!
         formatter.parse_response!
-        formatter.to_s.should == output_format
+        expect(formatter.to_s).to eq(output_format)
       end
     end
   end

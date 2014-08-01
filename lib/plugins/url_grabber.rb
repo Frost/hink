@@ -21,22 +21,17 @@ class UrlGrabber
     # remove all non-printable characters
     message = m.message.scan(/[[:print:]]/).join
 
-    grab_urls(message).each { |response| m.reply(response, true) }
+    grab_urls(message).each do |response|
+      m.reply(render(m.user.nick, response[0], response[1]), true)
+    end
   end
 
-  def grab_urls(m)
+  def grab_urls(message)
     bot.loggers.debug("received url(s): #{message}")
 
-    extract_urls(message).each do |url|
-      title = extract_title(bot.loggers,url)
-
-      if title
-        template.render({
-          url: bitlyfy(url),
-          nick: m.user.nick,
-          content: title
-        })
-      end
+    extract_urls(message).collect do |url|
+      title = extract_title(url)
+      [url, title] if title
     end
   end
 
@@ -46,12 +41,20 @@ class UrlGrabber
     Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
   end
 
+  def render(nick, title, url)
+    template.render({
+      url: bitlyfy(url),
+      nick: nick,
+      content: title
+    })
+  end
+
   def extract_urls(message)
     return URI.extract(message, /https?/)
   end
 
-  def extract_title(logger, url)
-    logger.debug("extracting title for #{url}")
+  def extract_title(url)
+    bot.loggers.debug("extracting title for #{url}")
     uri = Helpers::Uri.new(url)
     if uri.valid?
       return uri.render!

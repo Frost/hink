@@ -19,7 +19,7 @@ describe Formatters::Url do
 
     context "initialize" do
       it "sets the @uri attribute" do
-        subject.uri.should == uri
+        expect(subject.uri).to eq(uri)
       end
     end
 
@@ -27,7 +27,7 @@ describe Formatters::Url do
       it "stores the response" do
         formatter = subject
         formatter.perform_request!
-        formatter.response.should == response
+        expect(formatter.response).to eq(response)
       end
     end
 
@@ -36,7 +36,7 @@ describe Formatters::Url do
         formatter = subject
         formatter.perform_request!
         formatter.parse_response!
-        formatter.title.should == title
+        expect(formatter.title).to eq(title)
       end
     end
 
@@ -45,7 +45,7 @@ describe Formatters::Url do
         formatter = subject
         formatter.perform_request!
         formatter.parse_response!
-        formatter.to_s.should == output_format
+        expect(formatter.to_s).to eq(output_format)
       end
     end
   end

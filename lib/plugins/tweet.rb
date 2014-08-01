@@ -10,11 +10,11 @@ class Tweet
   def initialize(*args)
     super
 
-    Twitter.configure do |config|
+    @client = Twitter::REST::Client.new do |config|
       config.consumer_key = Hink.config[:twitter][:consumer_key]
       config.consumer_secret = Hink.config[:twitter][:consumer_secret]
-      config.oauth_token = Hink.config[:twitter][:oauth_token]
-      config.oauth_token_secret = Hink.config[:twitter][:oauth_token_secret]
+      config.access_token = Hink.config[:twitter][:access_token]
+      config.access_token_secret = Hink.config[:twitter][:access_token_secret]
     end
   end
 
@@ -38,8 +38,8 @@ class Tweet
   end
 
   def tweets(account)
-    tweets = Twitter.user_timeline(account, timeline_options(account)).compact
-    @@last_update[account] = tweets.first[:id] unless tweets.first.nil?
+    tweets = @client.user_timeline(account, timeline_options(account)).compact
+    @@last_update[account] = tweets.first[:id] if tweets.any?
     return tweets
   end
 
@@ -52,4 +52,5 @@ class Tweet
     tweet.extract_hash_info!
     tweet.to_s
   end
+
 end

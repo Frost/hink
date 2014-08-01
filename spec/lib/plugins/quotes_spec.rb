@@ -30,16 +30,16 @@ describe Quote do
     context "with valid attributes" do
       it "can be saved" do
         q = Quote.new(valid_attributes)
-        q.should be_valid
-        q.save.should be_true
+        expect(q).to be_valid
+        expect(q.save).to eq(true)
       end
     end
 
     context "with invalid attributes" do
       it "cannot be saved" do
         q = Quote.new
-        q.should_not be_valid
-        q.save.should_not be_true
+        expect(q).to_not be_valid
+        expect(q.save).to eq(false)
       end
     end
   end
@@ -52,19 +52,19 @@ describe Quote do
     it "sets the deleted_at attribute" do
       @q.destroy
 
-      @q.deleted_at.should_not be_nil
+      expect(@q.deleted_at).to_not be_nil
     end
 
     it "doesn't actually remove the quote" do
       @q.destroy
 
-      repository(:default).adapter.select("SELECT * from quotes WHERE id = #{@q.id}").should_not be_empty
+      expect(repository(:default).adapter.select("SELECT * from quotes WHERE id = #{@q.id}")).to_not be_empty
     end
 
     it "doesn't show up in an ordinary query" do
       @q.destroy
 
-      Quote.all.should_not include(@q)
+      expect(Quote.all).to_not include(@q)
     end
   end
 end
@@ -86,7 +86,7 @@ describe Quotes do
   describe "quote" do
     before(:all) do
       1.upto(10) do |i| 
-        q = Quote.create(valid_attributes.merge(:quote => i.to_s))
+        Quote.create(valid_attributes.merge(:quote => i.to_s))
       end
 
       @m = OpenStruct.new(:channel => "#test-hink")
@@ -96,7 +96,7 @@ describe Quotes do
       it "returns a random quote" do
         quote = Quotes.get_random(@m)
 
-        Quote.all.should include(quote)
+        expect(Quote.all).to include(quote)
       end
     end
 
@@ -105,7 +105,7 @@ describe Quotes do
         filter = "1"
         quote = Quotes.get_random(@m, filter)
 
-        quote.quote.should =~ /#{filter}/
+        expect(quote.quote).to match(/#{filter}/)
       end
     end
 

@@ -7,7 +7,7 @@ describe Helpers::UriExtractor do
   describe "initialize" do
     it "sets the uri attribute" do
       uri = Helpers::Uri.new("http://ceri.se")
-      uri.uri.should_not be_nil
+      expect(uri.uri).to_not be_nil
     end
   end
 
@@ -19,7 +19,7 @@ describe Helpers::UriExtractor do
       )
 
       uri = Helpers::Uri.new("http://validtopdomain.com/existing")
-      uri.valid?.should == true
+      expect(uri.valid?).to eq(true)
     end
 
     it "returns true for a valid url with some crap at the end" do
@@ -29,7 +29,7 @@ describe Helpers::UriExtractor do
       )
 
       uri = Helpers::Uri.new("http://validtopdomain.com/existing/)")
-      uri.valid?.should == true
+      expect(uri.valid?).to eq(true)
     end
 
     it "returns false for a non-existing page" do
@@ -38,14 +38,14 @@ describe Helpers::UriExtractor do
         body: ""
       )
       uri = Helpers::Uri.new("http://validtopdomain.com/nonexisting")
-      uri.valid?.should == false
+      expect(uri.valid?).to eq(false)
     end
 
     it "returns false for a non-existing site" do
       stub_request(:head, "http://invalidtopdomain.com").to_raise(SocketError)
 
       uri = Helpers::Uri.new("http://invalidtopdomain.com")
-      uri.valid?.should == false
+      expect(uri.valid?).to eq(false)
     end
   end
 
@@ -56,7 +56,7 @@ describe Helpers::UriExtractor do
       uris.each do |uri|
         uri = Helpers::Uri.new(uri)
         uri.sanitize_ending!
-        uri.uri.should == "http://ceri.se/"
+        expect(uri.uri).to eq("http://ceri.se/")
       end
     end
   end
@@ -64,12 +64,12 @@ describe Helpers::UriExtractor do
   describe "format" do
     it "renders tweets with the Twitter formatter" do
       uri = Helpers::Uri.new("https://twitter.com/#!/eslinge/status/125580490223783937")
-      uri.format.should == :twitter
+      expect(uri.format).to eq(:twitter)
     end
 
     it "defaults to the Url formatter" do
       uri = Helpers::Uri.new("http://aosetnhusaontehusnothesnuthosnt.com")
-      uri.format.should == :url
+      expect(uri.format).to eq(:url)
     end
   end
 
@@ -85,7 +85,7 @@ describe Helpers::UriExtractor do
       )
 
       uri = Helpers::Uri.new("https://twitter.com/#!/eslinge/status/125580490223783937")
-      uri.render!.should == twitter_output
+      expect(uri.render!).to eq(twitter_output)
     end
   end
 end

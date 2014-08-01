@@ -5,8 +5,8 @@ require "formatters/feed"
 require 'plugins/feed'
 
 describe Feed do
-  let(:bot) { Cinch::Bot.new }
-  let(:feed_url) { "http://news.example.com" }
+  bot = Cinch::Bot.new
+  feed_url = "http://news.example.com" 
   let(:feed_template) {
     %(
       <rss version="2.0">
@@ -34,13 +34,11 @@ describe Feed do
   before(:all) do
     bot.loggers.level = :fatal
     Hink.setup(bot)
-    Formatters::Feed.stub(:to_s)
   end
 
   describe "interval" do
     before(:each) do
-      Hink.stub(:config).and_return(
-        {
+      allow(Hink).to receive_messages(config: {
           feed: {
             uris: %w[ http://news.example.com ],
             interval: 5,
@@ -64,13 +62,14 @@ describe Feed do
       end
 
       it "tries to parse that post" do
-        Formatters::Feed.any_instance.should_receive(:render)
+        allow_any_instance_of(Formatters::Feed).to receive(:render)
         subject.check_news
       end
 
       it "renders correct output" do
-        Formatters::Feed.any_instance.should_receive(:render).and_return(item_output)
-        subject.check_news.should == [item_output]
+        allow_any_instance_of(Formatters::Feed).
+          to receive_messages(render: item_output)
+        expect(subject.check_news).to eq([item_output])
       end
 
     end
@@ -86,7 +85,7 @@ describe Feed do
       end
 
       it "returns nothing" do
-        subject.check_news.should == []
+        expect(subject.check_news).to eq([])
       end
     end
   end

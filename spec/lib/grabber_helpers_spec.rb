@@ -10,39 +10,39 @@ describe GrabberHelpers do
 
   describe "constantize" do
     it "transforms the given string to a constant" do
-      subject.constantize("Object").should == Object
+      expect(subject.constantize("Object")).to eq(Object)
     end
   end
 
   describe "underscore" do
     it "replaces spaces with underscores" do
-      subject.underscore("foo bar baz").should == "foo_bar_baz"
+      expect(subject.underscore("foo bar baz")).to eq("foo_bar_baz")
     end
 
     it "transforms FooBar to foo_bar" do
-      subject.underscore("FooBar").should == "foo_bar"
+      expect(subject.underscore("FooBar")).to eq("foo_bar")
     end
   end
 
   describe "sanitize_title" do
     describe "sanitize_title" do
       it "should not mess with sane titles" do
-        subject.sanitize_title("").should == ""
-        subject.sanitize_title("ab").should == "ab"
+        expect(subject.sanitize_title("")).to eq("")
+        expect(subject.sanitize_title("ab")).to eq("ab")
       end
 
       it "should handle linebreaks" do
-        subject.sanitize_title("a\nb").should == "a b"
-        subject.sanitize_title(" a\nb ").should == "a b"
-        subject.sanitize_title(" a\n\n\nb ").should == "a b"
-        subject.sanitize_title("\nab\n").should == "ab"
-        subject.sanitize_title("\n\n\nab\n\n\n").should == "ab"
+        expect(subject.sanitize_title("a\nb")).to eq("a b")
+        expect(subject.sanitize_title(" a\nb ")).to eq("a b")
+        expect(subject.sanitize_title(" a\n\n\nb ")).to eq("a b")
+        expect(subject.sanitize_title("\nab\n")).to eq("ab")
+        expect(subject.sanitize_title("\n\n\nab\n\n\n")).to eq("ab")
       end
 
       it "should handle whitespace" do
-        subject.sanitize_title("a b").should == "a b"
-        subject.sanitize_title(" a b ").should == "a b"
-        subject.sanitize_title("   a   b   ").should == "a b"
+        expect(subject.sanitize_title("a b")).to eq("a b")
+        expect(subject.sanitize_title(" a b ")).to eq("a b")
+        expect(subject.sanitize_title("   a   b   ")).to eq("a b")
       end
     end
   end
