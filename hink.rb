@@ -4,7 +4,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'cinch'
 require 'yaml'
-$:<< File.dirname(__FILE__) + '/lib'
+$LOAD_PATH << File.dirname(__FILE__) + '/lib'
 require 'config'
 require 'grabber_helpers'
 include GrabberHelpers
@@ -15,13 +15,13 @@ Hink.config[:cinch][:plugins].map do |plugin|
   require plugin_file
 end
 
-
 bot = Cinch::Bot.new do
   configure do |c|
-    c.nick = Hink.config[:cinch][:nick]
-    c.server = Hink.config[:cinch][:server]
-    c.channels = Hink.config[:cinch][:channels]
-    c.plugins.plugins = Hink.config[:cinch][:plugins].map {|plugin| constantize(plugin) }
+    cinch = Hink.config[:cinch]
+    c.nick = cinch[:nick]
+    c.server = cinch[:server]
+    c.channels = cinch[:channels]
+    c.plugins.plugins = cinch[:plugins].map { |plugin| constantize(plugin) }
   end
 end
 

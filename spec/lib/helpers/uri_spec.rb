@@ -3,7 +3,7 @@ require "helpers/uri"
 
 include WebMock::API
 
-describe Helpers::UriExtractor do
+describe Helpers::Uri do
   describe "initialize" do
     it "sets the uri attribute" do
       uri = Helpers::Uri.new("http://ceri.se")

@@ -1,10 +1,11 @@
-require "config"
-require "grabber_helpers"
-require "mechanize"
-require "formatters/twitter"
-require "formatters/url"
+require 'config'
+require 'grabber_helpers'
+require 'mechanize'
+require 'formatters/twitter'
+require 'formatters/url'
 
 module Helpers
+  # Check if a URI is valid
   class Uri
     include GrabberHelpers
     attr_reader :uri
@@ -15,18 +16,16 @@ module Helpers
     end
 
     def valid?
-      begin
-        @headers = @agent.head(@uri)
-        true
-      rescue Mechanize::ResponseCodeError => e
-        if e.response_code.to_i == 404 && sanitize_ending!
-          retry
-        else
-          false
-        end
-      rescue SocketError => e
+      @headers = @agent.head(@uri)
+      true
+    rescue Mechanize::ResponseCodeError => e
+      if e.response_code.to_i == 404 && sanitize_ending!
+        retry
+      else
         false
       end
+    rescue SocketError => e
+      false
     end
 
     # Returns true if anything was sanitized,
@@ -63,13 +62,5 @@ module Helpers
     def render!
       formatter.parse(@uri, Hink.config[:url_grabber][:formatters][format])
     end
-  end
-
-  class UriExtractor
-
-    def self.valid?(uri)
-      Uri.new(uri).valid?
-    end
-
   end
 end

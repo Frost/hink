@@ -21,6 +21,7 @@ def valid_parameters
     ),
     channel: "#test-hink"
   )
+  allow(m).to receive(:reply)
   return m, "<Frost> Some random boring made-up self-quote"
 end
 
@@ -71,41 +72,51 @@ end
 
 
 describe Quotes do
+  bot = Cinch::Bot.new
+
+  before(:all) do
+    bot.loggers.level = :fatal
+    Hink.setup(bot)
+  end
+
+  subject { Quotes.new(bot) }
 
   describe "add_quote" do
     context "with valid parameters" do
       it "stores the quote" do
-        m, quote = valid_parameters 
+        m, quote = valid_parameters
         expect {
-          Quotes.add_quote(m, quote)
+          subject.add_quote(m, quote)
         }.to change(Quote, :count).by(1)
       end
     end
   end
 
-  describe "quote" do
+  describe "search_quote" do
     before(:all) do
       1.upto(10) do |i| 
         Quote.create(valid_attributes.merge(:quote => i.to_s))
       end
-
-      @m = OpenStruct.new(:channel => "#test-hink")
     end
 
     context "without filter" do
       it "returns a random quote" do
-        quote = Quotes.get_random(@m)
-
-        expect(Quote.all).to include(quote)
+        m, _quote = valid_parameters
+        expect(m).to receive(:reply) do |reply|
+          expect(Quote.all.map(&:quote)).to include(reply)
+        end
+        subject.search_quote(m, nil)
       end
     end
 
     context "with filter" do
       it "returns a random quote matching the filter" do
         filter = "1"
-        quote = Quotes.get_random(@m, filter)
-
-        expect(quote.quote).to match(/#{filter}/)
+        m, _quote = valid_parameters
+        expect(m).to receive(:reply) do |reply|
+          expect(reply).to match(filter)
+        end
+        subject.search_quote(m, filter)
       end
     end
 
