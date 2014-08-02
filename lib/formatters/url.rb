@@ -1,10 +1,11 @@
-require "mechanize"
-require "liquid"
-require "nokogiri"
-require "htmlentities"
+require 'mechanize'
+require 'liquid'
+require 'nokogiri'
+require 'htmlentities'
 require_relative 'base.rb'
 
 module Formatters
+  # Format an url with its title
   class Url < Base
     attr_reader :title
 
@@ -15,7 +16,7 @@ module Formatters
     end
 
     def parse_response!
-      html = Nokogiri::HTML(@response).at_css('title').content || ""
+      html = Nokogiri::HTML(@response).at_css('title').content || ''
 
       @title = sanitize(html)
     end
@@ -25,7 +26,7 @@ module Formatters
     end
 
     def to_s
-      Liquid::Template.parse(template).render('type' => "Url", 'title' => @title)
+      Liquid::Template.parse(template).render('type' => 'Url', 'title' => @title)
     end
   end
 end

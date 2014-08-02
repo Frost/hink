@@ -1,7 +1,8 @@
+# Very basic "hello world" plugin.
 class Hello
   include Cinch::Plugin
 
-  match /hello/i
+  match(/hello/i)
   set(
     react_on: :channel
   )

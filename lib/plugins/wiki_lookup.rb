@@ -2,6 +2,7 @@ require 'cinch'
 require 'mechanize'
 require 'grabber_helpers'
 
+# Extract link and title from configured mediawiki
 class WikiLookup
   include Cinch::Plugin
   include GrabberHelpers
@@ -10,9 +11,9 @@ class WikiLookup
 
   set(
     prefix: '',
-    :react_on => :channel
+    react_on: :channel
   )
-  match LINK_REGEX
+  match(LINK_REGEX)
 
   def execute(m)
     extract_urls(m).map do |match, title|
@@ -30,12 +31,10 @@ class WikiLookup
   end
 
   def fetch_page(url)
-    begin
-      return Mechanize.new.get(url)
-    rescue Mechanize::ResponseCodeError => e
-      bot.loggers.debug e.inspect
-      return nil
-    end
+    return Mechanize.new.get(url)
+  rescue Mechanize::ResponseCodeError => e
+    bot.loggers.debug e.inspect
+    return nil
   end
 
   def url(match)

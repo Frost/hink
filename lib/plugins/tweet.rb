@@ -1,12 +1,14 @@
-require "cinch"
-require "twitter"
-require "formatters/twitter"
+require 'cinch'
+require 'twitter'
+require 'formatters/twitter'
 
+# Read tweets from configured accounts periodically
 class Tweet
   include Cinch::Plugin
-  timer ::Hink.config[:twitter][:interval].to_i*60, method: :check_tweets
+  timer(::Hink.config[:twitter][:interval].to_i * 60, method: :check_tweets)
 
-  @@last_update = {}
+  @last_update = {}
+
   def initialize(*args)
     super
 
@@ -19,32 +21,32 @@ class Tweet
   end
 
   def check_tweets
-    bot.loggers.debug("checking tweets")
+    bot.loggers.debug('checking tweets')
     accounts = Hink.config[:twitter][:accounts]
-    write_to_channels(accounts.collect {|account| check(account) }.flatten)
+    write_to_channels(accounts.map { |account| check(account) }.flatten)
   end
 
- private
+  private
 
   def check(account)
-    output = tweets(account).collect { |item| render_tweet(item) }
-    return output.compact.reverse
+    output = tweets(account).map { |item| render_tweet(item) }
+    output.compact.reverse
   end
 
   def write_to_channels(tweets)
     tweets.each do |item|
-      bot.channels.uniq.map {|c| c.send(item) }
+      bot.channels.uniq.map { |c| c.send(item) }
     end
   end
 
   def tweets(account)
-    tweets = @client.user_timeline(account, timeline_options(account)).compact
-    @@last_update[account] = tweets.first[:id] if tweets.any?
-    return tweets
+    @client.user_timeline(account, timeline_options(account)).tap do |tweets|
+      @@last_update[account] = tweets.first[:id] if tweets.any?
+    end
   end
 
   def timeline_options(account)
-    { since_id: @@last_update[account] }.select {|k,v| !v.nil? }
+    { since_id: @@last_update[account] }.select { |_k, v| !v.nil? }
   end
 
   def render_tweet(tweet)
@@ -52,5 +54,4 @@ class Tweet
     tweet.extract_hash_info!
     tweet.to_s
   end
-
 end

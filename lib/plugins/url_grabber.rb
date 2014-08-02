@@ -6,13 +6,14 @@ require 'nokogiri'
 require 'mechanize'
 require 'liquid'
 require 'helpers/uri'
-require "grabber_helpers"
+require 'grabber_helpers'
 
+# Fetch html title from a URL, if present
 class UrlGrabber
   include Cinch::Plugin
 
   set(prefix: '', react_on: :channel)
-  match(/https?/, :method => :execute)
+  match(/https?/, method: :execute)
 
   def execute(m)
     # don't reply to urls posted by self
@@ -29,54 +30,56 @@ class UrlGrabber
   def grab_urls(message)
     bot.loggers.debug("received url(s): #{message}")
 
-    extract_urls(message).collect do |url|
+    extract_urls(message).map do |url|
       title = extract_title(url)
       [url, title] if title
     end
   end
 
- private
+  private
 
   def template
     Liquid::Template.parse(Hink.config[:url_grabber][:output_format])
   end
 
   def render(nick, title, url)
-    template.render({
-      url: bitlyfy(url),
-      nick: nick,
-      content: title
-    })
+    template.render(url: bitlyfy(url),
+                    nick: nick,
+                    content: title
+                   )
   end
 
   def extract_urls(message)
-    return URI.extract(message, /https?/)
+    URI.extract(message, /https?/)
   end
 
   def extract_title(url)
     bot.loggers.debug("extracting title for #{url}")
     uri = Helpers::Uri.new(url)
-    if uri.valid?
-      return uri.render!
-    end
+    uri.render! if uri.valid?
   end
 
   def bitlyfy(url)
     return nil unless Hink.config[:bitly]
-    response = Mechanize.new.get("http://api.bitly.com/v3/shorten",
-      :login => Hink.config[:bitly][:login],
-      :apiKey => Hink.config[:bitly][:api_key],
-      :format => "json",
-      :longUrl => url).body
-    response_json = JSON.parse(response)
+    response_json = JSON.parse(bitly_request(url))
 
-    if response_json["status_code"].to_i == 200
-      return response_json["data"]["url"]
+    if response_json['status_code'].to_i == 200
+      response_json['data']['url']
     else
-      return :error
+      :error
     end
   rescue => e
     puts e.class, e.message
-    return :error
+    :error
+  end
+
+  def bitly_request(url)
+    params = {
+      login: Hink.config[:bitly][:login],
+      apiKey: Hink.config[:bitly][:api_key],
+      format: 'json',
+      longUrl: url
+    }
+    Mechanize.new.get('http://api.bitly.com/v3/shorten', params).body
   end
 end

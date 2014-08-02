@@ -3,9 +3,9 @@ require 'plugins/github'
 
 describe Github do
   context "DEFAULTS" do
-    describe "github_regex" do
+    describe "regex" do
       subject do
-        Github::DEFAULTS[:github_regex]
+        Github::DEFAULTS[:regex]
       end
 
       it "should match a user query" do
